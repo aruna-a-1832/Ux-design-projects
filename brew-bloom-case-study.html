@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brew & Bloom — UX Case Study · Aruna A</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF6F0;
+    --espresso: #2C1810;
+    --latte: #C8A882;
+    --foam: #F0E8DC;
+    --sage: #7A8C6E;
+    --blush: #E8C4B0;
+    --dark: #1A1208;
+    --mid: #6B5744;
+    --accent: #B85C3A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--espresso);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.5;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    background: var(--espresso);
+    padding: 80px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-left::after {
+    content: '';
+    position: absolute;
+    right: -60px;
+    top: 0;
+    bottom: 0;
+    width: 120px;
+    background: var(--espresso);
+    clip-path: polygon(0 0, 50% 0, 100% 50%, 50% 100%, 0 100%);
+    z-index: 3;
+  }
+
+  .hero-right {
+    background: var(--foam);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-right .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+  }
+  .blob-1 { width: 400px; height: 400px; background: var(--blush); top: -100px; right: -100px; animation: drift 8s ease-in-out infinite; }
+  .blob-2 { width: 300px; height: 300px; background: var(--latte); bottom: -80px; left: -80px; animation: drift 10s ease-in-out infinite reverse; }
+  .blob-3 { width: 200px; height: 200px; background: var(--sage); top: 40%; left: 30%; animation: drift 12s ease-in-out infinite 2s; }
+
+  @keyframes drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(20px, -20px) scale(1.05); }
+    66% { transform: translate(-15px, 15px) scale(0.97); }
+  }
+
+  .mockup-card {
+    position: relative;
+    z-index: 2;
+    background: white;
+    border-radius: 24px;
+    width: 260px;
+    height: 520px;
+    box-shadow: 0 40px 80px rgba(44,24,16,0.25), 0 10px 20px rgba(44,24,16,0.1);
+    overflow: hidden;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-16px) rotate(-2deg); }
+  }
+
+  .mockup-top {
+    background: var(--espresso);
+    padding: 20px 16px 14px;
+    color: white;
+  }
+  .mockup-top .m-label { font-size: 9px; letter-spacing: 2px; opacity: 0.6; font-family: 'DM Mono', monospace; text-transform: uppercase; }
+  .mockup-top .m-title { font-family: 'Playfair Display', serif; font-size: 20px; margin-top: 4px; }
+  .mockup-top .m-sub { font-size: 10px; opacity: 0.7; margin-top: 2px; }
+
+  .mockup-body { padding: 14px; }
+  .mockup-section-label { font-size: 8px; letter-spacing: 2px; text-transform: uppercase; color: var(--mid); font-family: 'DM Mono', monospace; margin-bottom: 8px; }
+
+  .m-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    background: var(--foam);
+  }
+  .m-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .m-icon.coffee { background: #FDECD8; }
+  .m-icon.matcha { background: #E8F0E4; }
+  .m-icon.pastry { background: #FDF0E8; }
+  .m-info { flex: 1; }
+  .m-name { font-size: 10px; font-weight: 500; color: var(--espresso); }
+  .m-price { font-size: 9px; color: var(--mid); font-family: 'DM Mono', monospace; margin-top: 1px; }
+  .m-add { width: 20px; height: 20px; border-radius: 50%; background: var(--espresso); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; }
+
+  .m-order-btn {
+    background: var(--espresso);
+    color: white;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 500;
+    margin-top: 10px;
+    letter-spacing: 1px;
+  }
+
+  /* ── HERO TEXT ── */
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--latte);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: slideUp 0.8s ease forwards 0.2s;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(44px, 5vw, 68px);
+    font-weight: 900;
+    color: white;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: slideUp 0.8s ease forwards 0.4s;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--blush);
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.65);
+    max-width: 380px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: slideUp 0.8s ease forwards 0.6s;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: slideUp 0.8s ease forwards 0.8s;
+  }
+
+  .tag {
+    padding: 6px 14px;
+    border: 1px solid rgba(200,168,130,0.4);
+    border-radius: 100px;
+    font-size: 11px;
+    color: var(--latte);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+
+  .hero-meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 32px;
+    opacity: 0;
+    animation: slideUp 0.8s ease forwards 1s;
+  }
+
+  .meta-item .label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.35); font-family: 'DM Mono', monospace; margin-bottom: 6px; }
+  .meta-item .value { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 400; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTIONS ── */
+  section { padding: 100px 0; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 0 40px; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--blush); max-width: 60px; }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--espresso);
+    margin-bottom: 24px;
+  }
+
+  .section-title em { font-style: italic; color: var(--accent); }
+
+  .lead {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--mid);
+    max-width: 680px;
+  }
+
+  /* ── PROBLEM SECTION ── */
+  .problem-section { background: var(--foam); }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 60px;
+  }
+
+  .problem-card {
+    background: white;
+    border-radius: 20px;
+    padding: 32px;
+    border-left: 4px solid var(--accent);
+    box-shadow: 0 4px 24px rgba(44,24,16,0.06);
+  }
+
+  .problem-card .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--blush);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .problem-card h3 { font-size: 16px; font-weight: 500; margin-bottom: 10px; color: var(--espresso); }
+  .problem-card p { font-size: 14px; line-height: 1.7; color: var(--mid); }
+
+  /* ── PROCESS ── */
+  .process-section { background: white; }
+
+  .process-timeline {
+    display: flex;
+    gap: 0;
+    margin-top: 60px;
+    position: relative;
+  }
+
+  .process-timeline::before {
+    content: '';
+    position: absolute;
+    top: 36px;
+    left: 36px;
+    right: 36px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--latte), var(--blush), var(--sage));
+  }
+
+  .process-step {
+    flex: 1;
+    text-align: center;
+    padding: 0 16px;
+    position: relative;
+  }
+
+  .step-num {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--espresso);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 auto 20px;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 8px 24px rgba(44,24,16,0.2);
+  }
+
+  .process-step:nth-child(2) .step-num { background: var(--accent); }
+  .process-step:nth-child(3) .step-num { background: var(--sage); }
+  .process-step:nth-child(4) .step-num { background: var(--latte); }
+
+  .step-title { font-size: 15px; font-weight: 500; margin-bottom: 10px; color: var(--espresso); }
+  .step-desc { font-size: 13px; line-height: 1.6; color: var(--mid); }
+
+  /* ── DESIGN DECISIONS ── */
+  .decisions-section { background: var(--espresso); }
+  .decisions-section .section-title { color: white; }
+  .decisions-section .section-label { color: var(--blush); }
+  .decisions-section .section-label::after { background: rgba(200,168,130,0.3); }
+
+  .decisions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 60px;
+  }
+
+  .decision-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(200,168,130,0.2);
+    border-radius: 20px;
+    padding: 32px 28px;
+    transition: background 0.3s;
+  }
+
+  .decision-card:hover { background: rgba(255,255,255,0.09); }
+
+  .decision-icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+
+  .decision-card h3 { font-size: 15px; font-weight: 500; color: white; margin-bottom: 12px; }
+  .decision-card p { font-size: 13px; line-height: 1.7; color: rgba(255,255,255,0.55); }
+
+  /* ── OUTCOMES ── */
+  .outcomes-section { background: var(--cream); }
+
+  .outcomes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 60px;
+  }
+
+  .outcome-card {
+    background: white;
+    border-radius: 20px;
+    padding: 36px 28px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(44,24,16,0.07);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .outcome-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--latte), var(--accent));
+  }
+
+  .outcome-stat {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .outcome-label { font-size: 13px; color: var(--mid); line-height: 1.5; }
+
+  /* ── LEARNINGS ── */
+  .learnings-section { background: var(--foam); }
+
+  .learnings-list {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .learning-item {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    background: white;
+    border-radius: 16px;
+    padding: 28px 32px;
+    box-shadow: 0 2px 16px rgba(44,24,16,0.05);
+  }
+
+  .learning-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--blush);
+    line-height: 1;
+    min-width: 48px;
+  }
+
+  .learning-item h3 { font-size: 15px; font-weight: 500; margin-bottom: 8px; color: var(--espresso); }
+  .learning-item p { font-size: 14px; line-height: 1.7; color: var(--mid); }
+
+  /* ── CTA ── */
+  .cta-section {
+    background: var(--espresso);
+    padding: 80px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: 'B&B';
+    position: absolute;
+    font-family: 'Playfair Display', serif;
+    font-size: 280px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.03);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .cta-section .section-title { color: white; margin-bottom: 16px; }
+  .cta-section p { color: rgba(255,255,255,0.55); font-size: 16px; margin-bottom: 40px; }
+
+  .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  .btn-primary {
+    background: var(--blush);
+    color: var(--espresso);
+    padding: 16px 36px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(200,168,130,0.35); }
+
+  .btn-outline {
+    border: 1px solid rgba(200,168,130,0.4);
+    color: var(--latte);
+    padding: 16px 36px;
+    border-radius: 100px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.2s;
+    display: inline-block;
+  }
+
+  .btn-outline:hover { background: rgba(200,168,130,0.1); }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(44,24,16,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(200,168,130,0.15);
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: white;
+  }
+
+  .nav-logo span { color: var(--blush); font-style: italic; }
+
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { font-size: 13px; color: rgba(255,255,255,0.6); text-decoration: none; letter-spacing: 0.5px; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--latte); }
+
+  /* ── QUOTE BLOCK ── */
+  .quote-block {
+    background: var(--foam);
+    border-left: 4px solid var(--latte);
+    border-radius: 0 16px 16px 0;
+    padding: 28px 32px;
+    margin: 40px 0;
+  }
+
+  .quote-block p {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--espresso);
+  }
+
+  .quote-block cite { display: block; font-size: 12px; font-style: normal; color: var(--mid); margin-top: 10px; font-family: 'DM Mono', monospace; letter-spacing: 1px; }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 768px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left::after { display: none; }
+    .problem-grid, .decisions-grid, .outcomes-grid { grid-template-columns: 1fr; }
+    .process-timeline { flex-direction: column; }
+    .process-timeline::before { display: none; }
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .container { padding: 0 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Aruna <span>A.</span></div>
+  <div class="nav-links">
+    <a href="#problem">Problem</a>
+    <a href="#process">Process</a>
+    <a href="#decisions">Design</a>
+    <a href="#outcomes">Outcomes</a>
+    <a href="https://aruna-a1832.my.canva.site/aruna-a" target="_blank">Portfolio ↗</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="eyebrow">UX/UI Case Study · 2026</div>
+    <h1 class="hero-title">Brew &<br><em>Bloom</em><br>Café</h1>
+    <p class="hero-desc">Bringing a neighbourhood café online — designing a warm, accessible ordering experience for the general public, from first click to confirmed order.</p>
+    <div class="hero-tags">
+      <span class="tag">UX Design</span>
+      <span class="tag">UI Design</span>
+      <span class="tag">Canva</span>
+      <span class="tag">Figma</span>
+      <span class="tag">Wireframing</span>
+      <span class="tag">Prototyping</span>
+    </div>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <div class="label">Role</div>
+        <div class="value">Solo UX Designer</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Tools</div>
+        <div class="value">Figma · Canva</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Type</div>
+        <div class="value">Course Project</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <!-- Phone Mockup -->
+    <div class="mockup-card">
+      <div class="mockup-top">
+        <div class="m-label">Brew & Bloom</div>
+        <div class="m-title">Good Morning ☕</div>
+        <div class="m-sub">What would you like today?</div>
+      </div>
+      <div class="mockup-body">
+        <div class="mockup-section-label">Popular Items</div>
+
+        <div class="m-item">
+          <div class="m-icon coffee">☕</div>
+          <div class="m-info">
+            <div class="m-name">Signature Latte</div>
+            <div class="m-price">₹180</div>
+          </div>
+          <div class="m-add">+</div>
+        </div>
+
+        <div class="m-item">
+          <div class="m-icon matcha">🍵</div>
+          <div class="m-info">
+            <div class="m-name">Matcha Bloom</div>
+            <div class="m-price">₹210</div>
+          </div>
+          <div class="m-add">+</div>
+        </div>
+
+        <div class="m-item">
+          <div class="m-icon pastry">🥐</div>
+          <div class="m-info">
+            <div class="m-name">Butter Croissant</div>
+            <div class="m-price">₹120</div>
+          </div>
+          <div class="m-add">+</div>
+        </div>
+
+        <div class="mockup-section-label" style="margin-top:12px;">Seasonal Special</div>
+        <div class="m-item" style="background:#FDF0E8;">
+          <div class="m-icon" style="background:#FDECD8;">🌸</div>
+          <div class="m-info">
+            <div class="m-name">Rose Cold Brew</div>
+            <div class="m-price">₹240</div>
+          </div>
+          <div class="m-add">+</div>
+        </div>
+
+        <div class="m-order-btn">VIEW FULL MENU →</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem-section" id="problem">
+  <div class="container">
+    <div class="section-label reveal">01 · The Problem</div>
+    <h2 class="section-title reveal">A café with great coffee,<br><em>invisible online</em></h2>
+    <p class="lead reveal">Brew & Bloom is a charming neighbourhood café with loyal customers — but zero digital presence. Customers had no way to browse the menu, check prices, or place orders without walking in. The challenge was to design their first-ever digital experience from scratch.</p>
+
+    <div class="quote-block reveal">
+      <p>"How do you design for everyone — from a tech-savvy student to a grandparent ordering their first coffee online?"</p>
+      <cite>— The central design question</cite>
+    </div>
+
+    <div class="problem-grid">
+      <div class="problem-card reveal">
+        <div class="num">01</div>
+        <h3>No Online Presence</h3>
+        <p>The café existed only physically. Potential customers searching online couldn't find the menu, hours, or any way to order — meaning lost business every day.</p>
+      </div>
+      <div class="problem-card reveal">
+        <div class="num">02</div>
+        <h3>All-Age Accessibility</h3>
+        <p>The customer base ranged from college students to older adults. Any solution needed to work for first-time smartphone users as much as digital natives.</p>
+      </div>
+      <div class="problem-card reveal">
+        <div class="num">03</div>
+        <h3>Warmth Must Translate</h3>
+        <p>The café's biggest asset is its cosy, welcoming atmosphere. The digital experience had to feel equally warm — not clinical or generic like typical food delivery apps.</p>
+      </div>
+      <div class="problem-card reveal">
+        <div class="num">04</div>
+        <h3>Simple Ordering Flow</h3>
+        <p>The ordering journey had to be intuitive enough to complete in under 2 minutes — minimal steps, clear hierarchy, no confusion about what to tap next.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process-section" id="process">
+  <div class="container">
+    <div class="section-label reveal">02 · Design Process</div>
+    <h2 class="section-title reveal">From blank canvas<br>to <em>live website</em></h2>
+    <p class="lead reveal">Following the Google UX Design framework — a structured, user-centred approach even for a solo course project.</p>
+
+    <div class="process-timeline">
+      <div class="process-step reveal">
+        <div class="step-num">1</div>
+        <div class="step-title">Empathise</div>
+        <div class="step-desc">Identified target users across age groups. Considered varying levels of digital literacy and café ordering contexts (dine-in vs. takeaway).</div>
+      </div>
+      <div class="process-step reveal">
+        <div class="step-num">2</div>
+        <div class="step-title">Define</div>
+        <div class="step-desc">Defined the core problem: users need a simple, warm digital space to browse and order from a café with no existing online presence.</div>
+      </div>
+      <div class="process-step reveal">
+        <div class="step-num">3</div>
+        <div class="step-title">Ideate</div>
+        <div class="step-desc">Sketched multiple layout approaches. Prioritised card-based menus, large tap targets, and a minimal checkout flow for accessibility.</div>
+      </div>
+      <div class="process-step reveal">
+        <div class="step-num">4</div>
+        <div class="step-title">Prototype</div>
+        <div class="step-desc">Built low-fidelity wireframes in Figma (Google UX Certificate project), then high-fidelity designs and live site in Canva.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DESIGN DECISIONS -->
+<section class="decisions-section" id="decisions">
+  <div class="container">
+    <div class="section-label reveal">03 · Design Decisions</div>
+    <h2 class="section-title reveal">Every choice had<br><em>a reason</em></h2>
+    <p class="lead reveal" style="color:rgba(255,255,255,0.55);">Good UX isn't just about how it looks — it's about why every element is where it is.</p>
+
+    <div class="decisions-grid">
+      <div class="decision-card reveal">
+        <div class="decision-icon">🎨</div>
+        <h3>Warm Colour Palette</h3>
+        <p>Creams, browns, and blush tones were chosen to mirror the physical café's warmth — making users feel comfortable before they've even ordered.</p>
+      </div>
+      <div class="decision-card reveal">
+        <div class="decision-icon">📱</div>
+        <h3>Mobile-First Layout</h3>
+        <p>Most café customers browse on phones. Large tap targets, thumb-friendly navigation, and single-column menus reduce friction for all age groups.</p>
+      </div>
+      <div class="decision-card reveal">
+        <div class="decision-icon">🗂️</div>
+        <h3>Card-Based Menu</h3>
+        <p>Visual cards with food images, clear names, and prices at a glance reduce cognitive load — users don't need to read paragraphs to decide what they want.</p>
+      </div>
+      <div class="decision-card reveal">
+        <div class="decision-icon">🛒</div>
+        <h3>Minimal Checkout Steps</h3>
+        <p>Reduced the ordering flow to 3 steps: browse → add to cart → confirm. Each unnecessary step is a potential drop-off point, especially for older users.</p>
+      </div>
+      <div class="decision-card reveal">
+        <div class="decision-icon">✍️</div>
+        <h3>Serif Typography</h3>
+        <p>Playfair Display-style fonts convey quality and warmth — the kind of typographic tone you'd expect from a thoughtfully branded café, not a fast food chain.</p>
+      </div>
+      <div class="decision-card reveal">
+        <div class="decision-icon">⭐</div>
+        <h3>Featured Items First</h3>
+        <p>Popular and seasonal items appear at the top — reducing decision fatigue and gently guiding users toward the café's best offerings without overwhelming them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOMES -->
+<section class="outcomes-section" id="outcomes">
+  <div class="container">
+    <div class="section-label reveal">04 · Outcomes</div>
+    <h2 class="section-title reveal">What this project<br><em>delivered</em></h2>
+    <p class="lead reveal">From wireframe to live published website — a complete, end-to-end design journey.</p>
+
+    <div class="outcomes-grid">
+      <div class="outcome-card reveal">
+        <div class="outcome-stat">3</div>
+        <div class="outcome-label">Design phases completed<br>(Wireframe → Hi-Fi → Live site)</div>
+      </div>
+      <div class="outcome-card reveal">
+        <div class="outcome-stat">2</div>
+        <div class="outcome-label">Tools mastered end-to-end<br>(Figma + Canva)</div>
+      </div>
+      <div class="outcome-card reveal">
+        <div class="outcome-stat">1</div>
+        <div class="outcome-label">Fully published live website<br>accessible to the public</div>
+      </div>
+    </div>
+
+    <div class="quote-block reveal" style="margin-top:60px;">
+      <p>"This project taught me that designing for everyone means designing with restraint — not adding more, but removing what's unnecessary."</p>
+      <cite>— Aruna A, UX Designer</cite>
+    </div>
+  </div>
+</section>
+
+<!-- LEARNINGS -->
+<section class="learnings-section">
+  <div class="container">
+    <div class="section-label reveal">05 · Key Learnings</div>
+    <h2 class="section-title reveal">What I took away<br>from this <em>project</em></h2>
+
+    <div class="learnings-list">
+      <div class="learning-item reveal">
+        <div class="learning-num">01</div>
+        <div>
+          <h3>Constraints spark better design</h3>
+          <p>Working without formal user research data pushed me to think harder about assumptions — questioning every layout choice by asking "would this work for someone who rarely uses a smartphone?"</p>
+        </div>
+      </div>
+      <div class="learning-item reveal">
+        <div class="learning-num">02</div>
+        <div>
+          <h3>Figma to live site is a full UX story</h3>
+          <p>Taking a project from low-fidelity wireframe all the way to a published Canva website showed me how design decisions shift when real content, images, and interaction replace placeholders.</p>
+        </div>
+      </div>
+      <div class="learning-item reveal">
+        <div class="learning-num">03</div>
+        <div>
+          <h3>Visual brand is a UX tool, not decoration</h3>
+          <p>Choosing warm colours and typography wasn't just aesthetic — it built trust and comfort, which directly influences whether a user completes an order or abandons the site.</p>
+        </div>
+      </div>
+      <div class="learning-item reveal">
+        <div class="learning-num">04</div>
+        <div>
+          <h3>Next iteration: real user testing</h3>
+          <p>The biggest gap in this project was the absence of usability testing. My next version would include 5-user tests with varied age groups to validate assumptions and iterate on the checkout flow.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="section-title reveal">Want to see the live project<br>or my full portfolio?</h2>
+    <p class="reveal">Every project teaches something new. Here's where you can explore more of my work.</p>
+    <div class="cta-buttons reveal">
+      <a href="https://aruna-a1832.my.canva.site/brew-and-bloom-cafe-order" target="_blank" class="btn-primary">View Live Café Site ↗</a>
+      <a href="https://aruna-a1832.my.canva.site/aruna-a" target="_blank" class="btn-outline">My Portfolio ↗</a>
+      <a href="mailto:aruna.a1832@gmail.com" class="btn-outline">Get In Touch ↗</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav active state
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 120) current = s.getAttribute('id');
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--latte)' : '';
+    });
+  });
+</script>
+</body>
+</html>

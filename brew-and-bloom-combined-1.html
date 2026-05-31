@@ -1,0 +1,2321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brew & Bloom — Artisan Café</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== CSS VARIABLES ===== */
+  :root {
+    --cream:       #F7F2E8;
+    --beige:       #EDE5D4;
+    --beige-dark:  #D9CEBC;
+    --brown-deep:  #3B2314;
+    --brown-mid:   #6B3F26;
+    --brown-light: #A0674A;
+    --sage:        #7A9E7E;
+    --moss:        #4A6741;
+    --sage-light:  #B8D0BB;
+    --sage-pale:   #E8F0E9;
+    --gold:        #C5943A;
+    --white:       #FEFCF8;
+    --text-main:   #2A1A0E;
+    --text-muted:  #7A6655;
+    --text-light:  #A8917F;
+    --shadow-warm: 0 4px 24px rgba(59,35,20,0.10);
+    --shadow-lift: 0 12px 40px rgba(59,35,20,0.16);
+    --radius-card: 18px;
+    --radius-btn:  50px;
+    --transition:  0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-smooth: 0.22s ease;
+    --red-soft:     #C0392B;
+    --green-ok:     #2E7D52;
+  }
+
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    background: var(--cream);
+    color: var(--text-main);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== DECORATIVE BACKGROUND ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 20%, rgba(122,158,126,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 80%, rgba(107,63,38,0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== PAGE CONTAINER ===== */
+  .page-container {
+    display: none;
+  }
+  .page-container.active {
+    display: block;
+  }
+
+  /* ===== STICKY HEADER ===== */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(247,242,232,0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--beige-dark);
+    padding: 0 clamp(1rem, 4vw, 2.5rem);
+  }
+
+  .header-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+    gap: 1rem;
+  }
+
+  /* Logo */
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .logo-icon {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, var(--brown-mid), var(--brown-deep));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  .logo-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.55rem;
+    font-weight: 600;
+    color: var(--brown-deep);
+    line-height: 1;
+  }
+  .logo-text span {
+    color: var(--sage);
+  }
+
+  /* Nav links */
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color var(--transition-smooth);
+  }
+  .nav-links a:hover { color: var(--brown-mid); }
+
+  /* Cart button */
+  .cart-btn {
+    position: relative;
+    background: var(--brown-deep);
+    border: none;
+    border-radius: var(--radius-btn);
+    color: var(--cream);
+    padding: 0.55rem 1.2rem 0.55rem 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background var(--transition-smooth), transform var(--transition-smooth);
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .cart-btn:hover { background: var(--brown-mid); transform: scale(1.04); }
+  .cart-icon { font-size: 1.1rem; }
+  .cart-count {
+    background: var(--sage);
+    color: white;
+    border-radius: 50%;
+    width: 20px; height: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--transition);
+  }
+  .cart-count.bounce {
+    animation: cartBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes cartBounce {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.55); }
+    70%  { transform: scale(0.85); }
+    100% { transform: scale(1); }
+  }
+
+  /* ===== HERO STRIP ===== */
+  .hero-strip {
+    background: linear-gradient(135deg, var(--brown-deep) 0%, var(--brown-mid) 60%, var(--brown-light) 100%);
+    padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1rem, 4vw, 2.5rem);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-strip::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 20% 50%, rgba(122,158,126,0.18), transparent 55%),
+                      radial-gradient(circle at 80% 30%, rgba(197,148,58,0.12), transparent 50%);
+  }
+  .hero-strip::after {
+    content: '✦';
+    position: absolute;
+    bottom: -0.5rem;
+    right: 6%;
+    font-size: 8rem;
+    color: rgba(247,242,232,0.04);
+    font-family: serif;
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    font-weight: 500;
+    color: var(--sage-light);
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    position: relative;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.12;
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--sage-light);
+  }
+  .hero-subtitle {
+    font-size: 1rem;
+    color: rgba(247,242,232,0.72);
+    font-weight: 300;
+    max-width: 480px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+    position: relative;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: var(--radius-btn);
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    color: var(--sage-light);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    position: relative;
+  }
+
+  /* ===== BROWSE SECTION ===== */
+  .browse-section {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 3rem clamp(1rem, 4vw, 2.5rem);
+    position: relative;
+    z-index: 1;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 400;
+    color: var(--brown-deep);
+    margin-bottom: 2rem;
+  }
+
+  /* Category filter */
+  .category-filter {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+  .cat-btn {
+    background: var(--white);
+    border: 1px solid var(--beige-dark);
+    border-radius: 50px;
+    padding: 0.6rem 1.4rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-smooth);
+  }
+  .cat-btn:hover { border-color: var(--sage); color: var(--sage); }
+  .cat-btn.active { background: var(--sage); color: var(--white); border-color: var(--sage); }
+
+  /* Grid */
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.8rem;
+  }
+
+  /* Item card */
+  .item-card {
+    background: var(--white);
+    border-radius: var(--radius-card);
+    border: 1px solid rgba(217,206,188,0.4);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all var(--transition);
+    cursor: pointer;
+  }
+  .item-card:hover {
+    border-color: var(--sage);
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-4px);
+  }
+  .item-card.added {
+    animation: cardAdded 0.6s var(--transition);
+  }
+  @keyframes cardAdded {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  .item-image {
+    width: 100%;
+    height: 140px;
+    background: linear-gradient(135deg, var(--beige-light, #EDE5D4), var(--cream));
+    object-fit: cover;
+  }
+  .item-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  .item-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--brown-deep);
+    margin-bottom: 0.5rem;
+    line-height: 1.35;
+  }
+  .item-price {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--sage);
+    margin-bottom: 0.75rem;
+  }
+  .item-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .btn-customize {
+    flex-grow: 1;
+    background: var(--beige);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--brown-deep);
+    font-weight: 500;
+    transition: background var(--transition-smooth);
+  }
+  .btn-customize:hover { background: var(--beige-dark); }
+  .btn-add {
+    width: 36px;
+    height: 36px;
+    background: var(--sage);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-smooth);
+  }
+  .btn-add:hover { background: var(--moss); transform: scale(1.1); }
+  .btn-add.adding { animation: addBtnPulse 0.6s ease; }
+  @keyframes addBtnPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    position: fixed;
+    right: 0;
+    top: 68px;
+    width: 320px;
+    height: calc(100vh - 68px);
+    background: var(--white);
+    border-left: 1px solid var(--beige-dark);
+    display: flex;
+    flex-direction: column;
+    z-index: 50;
+    box-shadow: -4px 0 20px rgba(59,35,20,0.08);
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn { from { transform: translateX(100%); } }
+  @media (max-width: 1024px) { .sidebar { display: none; } }
+
+  .sidebar-header {
+    padding: 1.2rem;
+    border-bottom: 1px solid var(--beige);
+  }
+  .sidebar-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--brown-deep);
+  }
+  .sidebar-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+  .sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--beige);
+  }
+
+  .cart-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-light);
+  }
+  .cart-item {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+  }
+  .cart-item-thumb {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--beige);
+  }
+  .cart-item-info {
+    flex-grow: 1;
+  }
+  .cart-item-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--brown-deep);
+    line-height: 1.2;
+  }
+  .cart-item-price {
+    font-size: 0.8rem;
+    color: var(--sage);
+    margin-top: 0.25rem;
+  }
+  .cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .qty-btn {
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--beige-dark);
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    transition: all var(--transition-smooth);
+  }
+  .qty-btn:hover { background: var(--beige); color: var(--brown-deep); }
+  .qty-display {
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: 20px;
+    text-align: center;
+  }
+
+  .sidebar-subtotal {
+    display: none;
+  }
+  .subtotal-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+  }
+  .subtotal-label { color: var(--text-muted); }
+  .subtotal-val {
+    font-weight: 600;
+    color: var(--brown-deep);
+  }
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--brown-deep);
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--beige);
+  }
+  .total-val { color: var(--sage); }
+
+  .checkout-btn {
+    width: 100%;
+    background: var(--sage);
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background var(--transition-smooth);
+  }
+  .checkout-btn:hover:not(:disabled) { background: var(--moss); }
+  .checkout-btn:disabled {
+    background: var(--text-light);
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  /* ===== MOBILE DRAWER ===== */
+  .mobile-drawer-toggle {
+    display: none;
+    background: var(--sage);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    position: fixed;
+    bottom: 2rem;
+    right: 1rem;
+    z-index: 45;
+  }
+  @media (max-width: 1024px) { .mobile-drawer-toggle { display: block; } }
+
+  .cart-drawer {
+    position: fixed;
+    right: -320px;
+    top: 68px;
+    width: 320px;
+    height: calc(100vh - 68px);
+    background: var(--white);
+    border-left: 1px solid var(--beige-dark);
+    display: flex;
+    flex-direction: column;
+    z-index: 55;
+    box-shadow: -4px 0 20px rgba(59,35,20,0.08);
+    transition: right 0.3s ease;
+  }
+  .cart-drawer.open { right: 0; }
+  .drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    display: none;
+    z-index: 48;
+  }
+  .drawer-overlay.open { display: block; }
+
+  /* ===== CUSTOMIZE MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 200;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .customize-modal {
+    background: var(--white);
+    border-radius: var(--radius-card);
+    padding: 2rem;
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lift);
+  }
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--brown-deep);
+    margin-bottom: 0.5rem;
+  }
+  .modal-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .mod-group {
+    margin-bottom: 1.5rem;
+  }
+  .mod-group-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--brown-deep);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .mod-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .mod-chip {
+    background: var(--beige);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all var(--transition-smooth);
+  }
+  .mod-chip:hover { background: var(--beige-dark); }
+  .mod-chip.selected { background: var(--sage); color: white; border-color: var(--moss); }
+  .modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .modal-cancel {
+    flex: 1;
+    background: var(--beige);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem;
+    cursor: pointer;
+    color: var(--brown-deep);
+    font-weight: 600;
+    transition: background var(--transition-smooth);
+  }
+  .modal-cancel:hover { background: var(--beige-dark); }
+  .modal-add {
+    flex: 1;
+    background: var(--sage);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem;
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+    transition: background var(--transition-smooth);
+  }
+  .modal-add:hover { background: var(--moss); }
+
+  /* ===== TOAST ===== */
+  .toast-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 300;
+  }
+  .toast {
+    background: var(--brown-deep);
+    color: var(--cream);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    animation: toastSlide 0.3s ease;
+  }
+  @keyframes toastSlide { from { transform: translateX(400px); opacity: 0; } }
+
+  /* ===== CHECKOUT PAGE ===== */
+  .portfolio-banner {
+    background: linear-gradient(90deg, var(--moss), var(--sage));
+    color: #fff;
+    text-align: center;
+    padding: 0.55rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    position: relative; z-index: 10;
+  }
+  .portfolio-banner em {
+    font-style: normal;
+    background: rgba(255,255,255,0.18);
+    padding: 0.1em 0.5em;
+    border-radius: 3px;
+    margin: 0 0.25rem;
+  }
+
+  .checkout-steps {
+    display: flex; align-items: center; gap: 0;
+    font-size: 0.75rem; font-weight: 500;
+  }
+  .step {
+    display: flex; align-items: center; gap: 0.4rem;
+    color: var(--text-light); padding: 0 0.7rem; position: relative;
+  }
+  .step.active { color: var(--brown-mid); }
+  .step.done   { color: var(--sage); }
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+    background: transparent; transition: all 0.25s ease;
+  }
+  .step.active .step-num { background: var(--brown-mid); border-color: var(--brown-mid); color: #fff; }
+  .step.done   .step-num { background: var(--sage);       border-color: var(--sage);       color: #fff; }
+  .step-sep { width: 28px; height: 1.5px; background: var(--beige-dark); flex-shrink: 0; }
+  .step-label { white-space: nowrap; }
+  @media (max-width: 640px) { .step-label { display: none; } .step-sep { width: 16px; } }
+
+  .checkout-page {
+    max-width: 1200px; margin: 0 auto;
+    padding: clamp(1.5rem,4vw,2.5rem) clamp(1rem,4vw,2rem) 5rem;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+    align-items: start;
+    position: relative; z-index: 1;
+  }
+  @media (max-width: 900px) {
+    .checkout-page { grid-template-columns: 1fr; }
+    .order-summary-col { order: -1; }
+  }
+
+  /* ===== SECTION CARD ===== */
+  .section-card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(59,35,20,0.09);
+    border: 1px solid rgba(217,206,188,0.6);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    animation: fadeUp 0.4s ease both;
+  }
+  .section-card:nth-child(1) { animation-delay: 0.05s; }
+  .section-card:nth-child(2) { animation-delay: 0.12s; }
+  .section-card:nth-child(3) { animation-delay: 0.19s; }
+  .section-card:nth-child(4) { animation-delay: 0.26s; }
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(16px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.1rem 1.4rem;
+    border-bottom: 1px solid var(--beige);
+    gap: 0.8rem;
+  }
+  .card-header-left { display: flex; align-items: center; gap: 0.65rem; }
+  .card-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--brown-deep); color: var(--cream);
+    font-size: 0.75rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem; font-weight: 600; color: var(--brown-deep);
+  }
+  .card-edit-btn {
+    font-size: 0.75rem; font-weight: 500; color: var(--sage);
+    background: none; border: none; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 2px;
+    transition: color 0.2s;
+  }
+
+  .back-home-btn {
+    position: fixed;
+    top: 80px;
+    left: 1.5rem;
+    background: var(--sage);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 99;
+    transition: background 0.2s;
+  }
+  .back-home-btn:hover { background: var(--moss); }
+
+  .card-content {
+    padding: 1.4rem;
+  }
+
+  .option-group {
+    margin-bottom: 1.5rem;
+  }
+  .option-group:last-child { margin-bottom: 0; }
+  .option-group-title {
+    font-size: 0.85rem; font-weight: 600;
+    color: var(--brown-deep); text-transform: uppercase;
+    letter-spacing: 0.05em; margin-bottom: 1rem;
+  }
+  .option-cards {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+  }
+  @media (max-width: 600px) { .option-cards { grid-template-columns: 1fr; } }
+
+  .option-card {
+    border: 2px solid var(--beige-dark);
+    border-radius: 10px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    background: var(--white);
+  }
+  .option-card:hover { border-color: var(--sage); }
+  .option-card.selected {
+    border-color: var(--sage);
+    background: var(--sage-pale);
+  }
+  .option-card-icon {
+    font-size: 1.4rem; margin-bottom: 0.5rem;
+  }
+  .option-card-title {
+    font-size: 0.9rem; font-weight: 600;
+    color: var(--brown-deep); line-height: 1.3;
+  }
+  .option-card-desc {
+    font-size: 0.75rem; color: var(--text-light); margin-top: 0.3rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.2rem;
+  }
+  .form-label {
+    display: block; font-size: 0.85rem; font-weight: 600;
+    color: var(--brown-deep); margin-bottom: 0.6rem;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .form-input {
+    width: 100%; padding: 0.75rem 1rem;
+    border: 1px solid var(--beige-dark); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    background: var(--white);
+    transition: border-color 0.22s;
+  }
+  .form-input:focus {
+    outline: none; border-color: var(--sage);
+    box-shadow: 0 0 0 3px rgba(122,158,126,0.1);
+  }
+
+  .time-slots {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;
+  }
+  @media (max-width: 600px) { .time-slots { grid-template-columns: 1fr 1fr; } }
+
+  .time-slot {
+    border: 2px solid var(--beige-dark);
+    border-radius: 8px;
+    padding: 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.22s;
+    background: var(--white);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .time-slot:hover:not(.unavailable) { border-color: var(--sage); }
+  .time-slot.selected {
+    border-color: var(--sage);
+    background: var(--sage-pale);
+    color: var(--brown-deep);
+  }
+  .time-slot.unavailable {
+    color: var(--text-light);
+    background: rgba(0,0,0,0.02);
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .pay-tabs {
+    display: flex; gap: 0.5rem; margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--beige);
+  }
+  .pay-tab {
+    background: none; border: none;
+    padding: 0.8rem 1rem;
+    font-size: 0.85rem; font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.22s;
+  }
+  .pay-tab:hover { color: var(--brown-mid); }
+  .pay-tab.active {
+    color: var(--brown-deep);
+    border-bottom-color: var(--sage);
+  }
+
+  .pay-panel {
+    display: none;
+    animation: fadeUp 0.3s ease;
+  }
+  .pay-panel.visible { display: block; }
+
+  .promo-section {
+    background: var(--sage-pale);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .promo-input-group {
+    display: flex; gap: 0.5rem;
+  }
+  .promo-input {
+    flex: 1;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--beige-dark);
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+  }
+  .promo-btn {
+    background: var(--sage);
+    color: white; border: none;
+    border-radius: 6px; padding: 0.6rem 1rem;
+    font-weight: 600; cursor: pointer;
+    transition: background 0.22s;
+  }
+  .promo-btn:hover { background: var(--moss); }
+  .promo-success {
+    margin-top: 0.8rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: #E8F5E9;
+    border-left: 3px solid var(--sage);
+    display: none;
+  }
+  .promo-success.show { display: block; }
+
+  .place-order-btn {
+    width: 100%;
+    background: var(--sage);
+    color: white; border: none;
+    border-radius: 50px;
+    padding: 1rem;
+    font-size: 1rem; font-weight: 700;
+    cursor: pointer;
+    transition: background 0.22s;
+  }
+  .place-order-btn:hover:not(:disabled) { background: var(--moss); }
+  .place-order-btn:disabled {
+    background: var(--text-light);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  /* Order Summary */
+  .order-summary-col {
+    position: sticky;
+    top: 90px;
+  }
+
+  .summary-card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(59,35,20,0.09);
+    border: 1px solid rgba(217,206,188,0.6);
+    padding: 1.5rem;
+  }
+
+  .summary-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem; font-weight: 600;
+    color: var(--brown-deep); margin-bottom: 1.2rem;
+  }
+
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    font-size: 0.9rem;
+    color: var(--text-main);
+  }
+
+  .summary-item.divider {
+    border-top: 1px solid var(--beige);
+    border-bottom: 1px solid var(--beige);
+    margin: 0.75rem 0;
+  }
+
+  .summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--brown-deep);
+    padding-top: 0.75rem;
+  }
+
+  .success-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+  }
+  .success-overlay.show { display: flex; }
+
+  .success-modal {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 2.5rem;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: modalPop 0.4s ease;
+  }
+  @keyframes modalPop {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .success-icon { font-size: 4rem; margin-bottom: 1rem; }
+  .success-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem; font-weight: 600;
+    color: var(--brown-deep); margin-bottom: 0.5rem;
+  }
+  .success-subtitle {
+    color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;
+  }
+
+  .eta-box {
+    background: var(--sage-pale);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex; justify-content: space-around;
+  }
+  .eta-item {
+    text-align: center;
+  }
+  .eta-val {
+    font-size: 1.4rem; font-weight: 700;
+    color: var(--sage); line-height: 1;
+  }
+  .eta-label {
+    font-size: 0.75rem; color: var(--text-muted);
+    margin-top: 0.4rem;
+  }
+
+  .tracker-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 2rem;
+  }
+  .tracker-step {
+    text-align: center;
+    position: relative;
+  }
+  .ts-dot {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--beige);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto 0.5rem;
+    transition: all 0.3s;
+  }
+  .tracker-step.done .ts-dot {
+    background: var(--sage);
+  }
+  .tracker-step.active .ts-dot {
+    background: var(--sage);
+    transform: scale(1.15);
+  }
+  .ts-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+  }
+
+  .track-btn {
+    width: 100%;
+    background: var(--brown-deep);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .card-preview {
+    background: linear-gradient(135deg, var(--brown-mid), var(--brown-deep));
+    color: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .cp-number {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+  }
+  .cp-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .cp-left {
+    flex: 1;
+  }
+  .cp-label {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-bottom: 0.2rem;
+  }
+  .cp-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  .cp-expiry {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+  }
+  .cp-network {
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .saved-cards {
+    margin-bottom: 1.5rem;
+  }
+  .saved-card-row {
+    border: 2px solid var(--beige-dark);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.22s;
+  }
+  .saved-card-row:hover { border-color: var(--sage); }
+  .saved-card-row.selected {
+    border-color: var(--sage);
+    background: var(--sage-pale);
+  }
+  .card-last4 { font-weight: 600; color: var(--brown-deep); }
+  .card-date { color: var(--text-muted); font-size: 0.85rem; }
+
+  .gift-toggle {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--beige);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.22s;
+  }
+  .gift-toggle:hover { background: var(--sage-pale); }
+  .gift-checkbox {
+    width: 24px; height: 24px;
+    border: 2px solid var(--beige-dark);
+    border-radius: 6px;
+    display: flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.22s;
+  }
+  .gift-toggle.checked .gift-checkbox {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: white;
+  }
+  .gift-note {
+    background: var(--sage-pale);
+    border-left: 3px solid var(--sage);
+    padding: 1rem;
+    border-radius: 6px;
+    margin-top: 1rem;
+    display: none;
+  }
+  .gift-note.show { display: block; }
+  .gift-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--beige-dark);
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 60px;
+  }
+  .gift-textarea:focus {
+    outline: none;
+    border-color: var(--sage);
+  }
+
+  .wallet-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .wallet-btn {
+    border: 2px solid var(--beige-dark);
+    border-radius: 10px;
+    padding: 1rem;
+    background: var(--white);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.22s;
+  }
+  .wallet-btn:hover { border-color: var(--sage); }
+  .wallet-btn.selected {
+    border-color: var(--sage);
+    background: var(--sage-pale);
+  }
+  .wallet-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+  .wallet-name {
+    font-weight: 600;
+    color: var(--brown-deep);
+    font-size: 0.9rem;
+  }
+
+  .upi-verify {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .verify-btn {
+    background: var(--sage);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.22s;
+  }
+  .verify-btn:hover { background: var(--moss); }
+</style>
+</head>
+<body>
+
+<!-- ===== SHOP PAGE ===== -->
+<div id="shopPage" class="page-container active">
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" onclick="goToShop()">
+      <div class="logo-icon">☕</div>
+      <div class="logo-text">Brew <span>&</span> Bloom</div>
+    </a>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#menu">Our Menu</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </nav>
+    <button class="cart-btn" id="cartBtn" onclick="toggleDrawer()" aria-label="Shopping cart">
+      <span class="cart-icon">🛒</span>
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+</header>
+
+<!-- HERO STRIP -->
+<div class="hero-strip">
+  <div style="position: relative;">
+    <div class="hero-eyebrow">🌿 FRESH • ARTISAN • LOCAL</div>
+    <h1 class="hero-title">Where <em>Flavor</em> Blooms</h1>
+    <p class="hero-subtitle">Carefully sourced ingredients meet botanical inspiration in every cup.</p>
+    <span class="hero-badge">
+      <span>✓ Organic Certified</span>
+    </span>
+  </div>
+</div>
+
+<!-- BROWSE SECTION -->
+<section class="browse-section" id="menu">
+  <h2 class="section-title">Our Menu</h2>
+
+  <!-- Category Filter -->
+  <div class="category-filter">
+    <button class="cat-btn active" onclick="filterCategory('all', this)" aria-pressed="true">All Items</button>
+    <button class="cat-btn" onclick="filterCategory('drinks', this)" aria-pressed="false">Drinks</button>
+    <button class="cat-btn" onclick="filterCategory('pastries', this)" aria-pressed="false">Pastries</button>
+    <button class="cat-btn" onclick="filterCategory('bowls', this)" aria-pressed="false">Bowls & Salads</button>
+  </div>
+
+  <!-- Items Grid -->
+  <div class="items-grid">
+    <!-- ROW 1: DRINKS -->
+    <div class="item-card" data-category="drinks">
+      <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&q=80" alt="Lavender Cloud Latte" class="item-image">
+      <div class="item-content">
+        <div class="item-name">Lavender Cloud Latte</div>
+        <div class="item-price">$6.50</div>
+        <div class="item-buttons">
+          <button class="btn-customize" onclick="openCustomize(1)">Customize</button>
+          <button class="btn-add" onclick="addToCart(1, 'Lavender Cloud Latte', 6.50, this)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="item-card" data-category="drinks">
+      <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&q=80" alt="Bloom Cold Brew" class="item-image">
+      <div class="item-content">
+        <div class="item-name">Bloom Cold Brew</div>
+        <div class="item-price">$7.00</div>
+        <div class="item-buttons">
+          <button class="btn-customize" onclick="openCustomize(2)">Customize</button>
+          <button class="btn-add" onclick="addToCart(2, 'Bloom Cold Brew', 7.00, this)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="item-card" data-category="drinks">
+      <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=200&q=80" alt="Spiced Hazelnut Flat White" class="item-image">
+      <div class="item-content">
+        <div class="item-name">Spiced Hazelnut Flat White</div>
+        <div class="item-price">$6.00</div>
+        <div class="item-buttons">
+          <button class="btn-customize" onclick="openCustomize(3)">Customize</button>
+          <button class="btn-add" onclick="addToCart(3, 'Spiced Hazelnut Flat White', 6.00, this)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="item-card" data-category="drinks">
+      <img src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=200&q=80" alt="Hibiscus Garden Tea" class="item-image">
+      <div class="item-content">
+        <div class="item-name">Hibiscus Garden Tea</div>
+        <div class="item-price">$5.50</div>
+        <div class="item-buttons">
+          <button class="btn-customize" onclick="openCustomize(4)">Customize</button>
+          <button class="btn-add" onclick="addToCart(4, 'Hibiscus Garden Tea', 5.50, this)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="item-card" data-category="drinks">
+      <img src="https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=200&q=80" alt="Chamomile Dream Latte" class="item-image">
+      <div class="item-content">
+        <div class="item-name">Chamomile Dream Latte</div>
+        <div class="item-price">$5.75</div>
+        <div class="item-buttons">
+          <button class="btn-customize" onclick="openCustomize(5)">Customize</button>
+          <button class="btn-add" onclick="addToCart(5, 'Chamomile Dream Latte', 5.75, this)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2: PASTRIES -->
+    <div class="item-card" data-category="pastries">
+      <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=200&q=80" alt="Cardamom Rose Croissant" class="item-image">
+      <div class="item-content">
+        <div class="item-name">Cardamom Rose Croissant</div>
+        <div class="item-price">$4.75</div>
+        <div class="item-buttons">
+          <button class="btn-customize" onclick="openCustomize(6)">Customize</button>
+          <button class="btn-add" onclick="addToCart(6, 'Cardamom Rose Croissant', 4.75, this)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="item-card" data-category="pastries">
+      <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=200&q=80" alt="Lemon Blueberry Scone" class="item-image">
+      <div class="item-content">
+        <div class="item-name">Lemon Blueberry Scone</div>
+        <div class="item-price">$4.25</div>
+        <div class="item-buttons">
+          <button class="btn-customize" onclick="openCustomize(7)">Customize</button>
+          <button class="btn-add" onclick="addToCart(7, 'Lemon Blueberry Scone', 4.25, this)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 3: BOWLS -->
+    <div class="item-card" data-category="bowls">
+      <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=200&q=80" alt="Green Goddess Bowl" class="item-image">
+      <div class="item-content">
+        <div class="item-name">Green Goddess Bowl</div>
+        <div class="item-price">$12.50</div>
+        <div class="item-buttons">
+          <button class="btn-customize" onclick="openCustomize(8)">Customize</button>
+          <button class="btn-add" onclick="addToCart(8, 'Green Goddess Bowl', 12.50, this)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="item-card" data-category="bowls">
+      <img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=200&q=80" alt="Sunrise Açaí Bowl" class="item-image">
+      <div class="item-content">
+        <div class="item-name">Sunrise Açaí Bowl</div>
+        <div class="item-price">$13.00</div>
+        <div class="item-buttons">
+          <button class="btn-customize" onclick="openCustomize(9)">Customize</button>
+          <button class="btn-add" onclick="addToCart(9, 'Sunrise Açaí Bowl', 13.00, this)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="item-card" data-category="bowls">
+      <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=200&q=80" alt="Garden Herb Tartine" class="item-image">
+      <div class="item-content">
+        <div class="item-name">Garden Herb Tartine</div>
+        <div class="item-price">$14.00</div>
+        <div class="item-buttons">
+          <button class="btn-customize" onclick="openCustomize(10)">Customize</button>
+          <button class="btn-add" onclick="addToCart(10, 'Garden Herb Tartine', 14.00, this)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="item-card" data-category="bowls">
+      <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&q=80" alt="Seasonal Harvest Salad" class="item-image">
+      <div class="item-content">
+        <div class="item-name">Seasonal Harvest Salad</div>
+        <div class="item-price">$15.50</div>
+        <div class="item-buttons">
+          <button class="btn-customize" onclick="openCustomize(11)">Customize</button>
+          <button class="btn-add" onclick="addToCart(11, 'Seasonal Harvest Salad', 15.50, this)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="item-card" data-category="bowls">
+      <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80" alt="Smoked Mushroom Bowl" class="item-image">
+      <div class="item-content">
+        <div class="item-name">Smoked Mushroom Bowl</div>
+        <div class="item-price">$16.00</div>
+        <div class="item-buttons">
+          <button class="btn-customize" onclick="openCustomize(12)">Customize</button>
+          <button class="btn-add" onclick="addToCart(12, 'Smoked Mushroom Bowl', 16.00, this)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DESKTOP SIDEBAR -->
+<aside class="sidebar" style="margin-top: 68px;">
+  <div class="sidebar-header">
+    <div class="sidebar-title">Your Order</div>
+  </div>
+  <div class="sidebar-content">
+    <div class="cart-empty" id="sidebarCartEmpty">
+      <p>Your order is empty</p>
+    </div>
+    <div id="sidebarCartItems"></div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="sidebar-subtotal" id="sidebarSubtotal">
+      <div class="subtotal-row">
+        <span class="subtotal-label">Subtotal</span>
+        <span class="subtotal-val" id="subtotalVal">$0.00</span>
+      </div>
+      <div class="total-row">
+        <span>Total</span>
+        <span class="total-val" id="totalVal"><span>$0.50</span></span>
+      </div>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn" onclick="goToCheckout()" disabled>
+      🌿 Proceed to Checkout
+    </button>
+  </div>
+</aside>
+
+<!-- MOBILE DRAWER -->
+<button class="mobile-drawer-toggle" id="mobileDrawerToggle" onclick="toggleDrawer()">
+  🛒 Cart
+</button>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+
+<div class="cart-drawer" id="cartDrawer">
+  <div class="sidebar-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <div class="sidebar-title">Your Order</div>
+      <button onclick="toggleDrawer()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
+    </div>
+  </div>
+  <div class="sidebar-content">
+    <div class="cart-empty" id="drawerCartEmpty">
+      <p>Your order is empty</p>
+    </div>
+    <div id="drawerCartItems"></div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="sidebar-subtotal" id="drawerSubtotal">
+      <div class="subtotal-row">
+        <span class="subtotal-label">Subtotal</span>
+        <span class="subtotal-val" id="drawerSubtotalVal">$0.00</span>
+      </div>
+      <div class="total-row">
+        <span>Total</span>
+        <span class="total-val" id="drawerTotalVal"><span>$0.50</span></span>
+      </div>
+    </div>
+    <button class="checkout-btn" id="drawerCheckoutBtn" onclick="goToCheckout()" disabled>
+      🌿 Proceed to Checkout
+    </button>
+  </div>
+</div>
+
+<!-- CUSTOMIZE MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target === this) closeCustomize()">
+  <div class="customize-modal" id="customizeModal" role="dialog" aria-labelledby="modalTitle">
+    <h2 class="modal-title" id="modalTitle">Item Name</h2>
+    <p class="modal-subtitle" id="modalSubtitle">Personalize it to your taste</p>
+
+    <div class="mod-group">
+      <span class="mod-group-label">Size</span>
+      <div class="mod-options" role="group" aria-label="Size options">
+        <button class="mod-chip selected" onclick="selectChip(this, 'size')" aria-pressed="true">Regular</button>
+        <button class="mod-chip" onclick="selectChip(this, 'size')" aria-pressed="false">Large</button>
+        <button class="mod-chip" onclick="selectChip(this, 'size')" aria-pressed="false">Extra Large</button>
+      </div>
+    </div>
+
+    <div class="mod-group">
+      <span class="mod-group-label">Milk Option</span>
+      <div class="mod-options" role="group" aria-label="Milk options">
+        <button class="mod-chip selected" onclick="selectChip(this, 'milk')" aria-pressed="true">Dairy</button>
+        <button class="mod-chip" onclick="selectChip(this, 'milk')" aria-pressed="false">Almond</button>
+        <button class="mod-chip" onclick="selectChip(this, 'milk')" aria-pressed="false">Oat</button>
+        <button class="mod-chip" onclick="selectChip(this, 'milk')" aria-pressed="false">Coconut</button>
+      </div>
+    </div>
+
+    <div class="mod-group">
+      <span class="mod-group-label">Sweetness</span>
+      <div class="mod-options" role="group" aria-label="Sweetness options">
+        <button class="mod-chip selected" onclick="selectChip(this, 'sweet')" aria-pressed="true">Normal</button>
+        <button class="mod-chip" onclick="selectChip(this, 'sweet')" aria-pressed="false">Less Sweet</button>
+        <button class="mod-chip" onclick="selectChip(this, 'sweet')" aria-pressed="false">Extra Sweet</button>
+      </div>
+    </div>
+
+    <div class="mod-group">
+      <span class="mod-group-label">Temperature</span>
+      <div class="mod-options" role="group" aria-label="Temperature options">
+        <button class="mod-chip selected" onclick="selectChip(this, 'temp')" aria-pressed="true">Hot</button>
+        <button class="mod-chip" onclick="selectChip(this, 'temp')" aria-pressed="false">Iced</button>
+        <button class="mod-chip" onclick="selectChip(this, 'temp')" aria-pressed="false">Blended</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeCustomize()">Cancel</button>
+      <button class="modal-add" id="modalAddBtn" onclick="addFromModal()">Add to Order → $0.00</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer" aria-live="assertive" aria-atomic="true"></div>
+
+</div> <!-- end #shopPage -->
+
+<!-- ===== CHECKOUT PAGE ===== -->
+<div id="checkoutPage" class="page-container">
+
+<!-- Back Home Button -->
+<button class="back-home-btn" onclick="goToShop()">← Back Home</button>
+
+<!-- Header -->
+<header class="site-header">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); display: flex; align-items: center; justify-content: space-between; height: 64px;">
+    <a class="logo" onclick="goToShop()" style="cursor: pointer;">
+      <div class="logo-icon">☕</div>
+      <div class="logo-text">Brew <span>&</span> Bloom</div>
+    </a>
+    <div class="checkout-steps">
+      <div class="step done">
+        <div class="step-num">✓</div>
+        <div class="step-label">Cart</div>
+      </div>
+      <div class="step-sep"></div>
+      <div class="step active">
+        <div class="step-num">2</div>
+        <div class="step-label">Checkout</div>
+      </div>
+      <div class="step-sep"></div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-label">Confirmation</div>
+      </div>
+    </div>
+    <div class="header-secure">
+      <span>🔒 Secure</span>
+    </div>
+  </div>
+</header>
+
+<div class="portfolio-banner">
+  Demo checkout for <em>Brew & Bloom</em>. Use codes: <strong>BLOOM20</strong>, <strong>FRESH10</strong>, or <strong>MORNING15</strong> for discounts!
+</div>
+
+<!-- Checkout Page Content -->
+<div class="checkout-page">
+  <!-- Left Column: Checkout Form -->
+  <div>
+    <!-- 1. Fulfillment -->
+    <div class="section-card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-num">1</div>
+          <div class="card-title">How should we deliver?</div>
+        </div>
+      </div>
+      <div class="card-content">
+        <div class="option-group">
+          <div class="option-cards">
+            <div class="option-card selected" id="opt-pickup" onclick="selectOption(this, 'fulfil')" role="radio" aria-checked="true">
+              <div class="option-card-icon">🏪</div>
+              <div class="option-card-title">Pickup</div>
+              <div class="option-card-desc">Fast & convenient</div>
+            </div>
+            <div class="option-card" id="opt-delivery" onclick="selectOption(this, 'fulfil')" role="radio" aria-checked="false">
+              <div class="option-card-icon">🚴</div>
+              <div class="option-card-title">Delivery</div>
+              <div class="option-card-desc">To your doorstep</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Delivery Details -->
+    <div class="section-card" id="deliveryDetails">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-num">2</div>
+          <div class="card-title">Delivery Details</div>
+        </div>
+      </div>
+      <div class="card-content">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" placeholder="e.g. Sarah Anderson" value="Sarah Anderson">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" placeholder="sarah@example.com" value="sarah@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" class="form-input" placeholder="+1 (555) 000-0000" value="+1 (555) 123-4567">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Delivery Address</label>
+          <input type="text" class="form-input" placeholder="Street address" value="123 Oak Street">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" class="form-input" placeholder="City" value="Portland">
+          </div>
+          <div class="form-group">
+            <label class="form-label">State</label>
+            <input type="text" class="form-input" placeholder="OR" value="OR">
+          </div>
+          <div class="form-group">
+            <label class="form-label">ZIP</label>
+            <input type="text" class="form-input" placeholder="97201" value="97201">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Delivery Instructions</label>
+          <input type="text" class="form-input" placeholder="e.g. Ring doorbell twice" value="Ring doorbell twice">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Pickup Time</label>
+          <div class="time-slots">
+            <button class="time-slot" onclick="selectSlot(this)" aria-pressed="false">12:00 PM</button>
+            <button class="time-slot selected" onclick="selectSlot(this)" aria-pressed="true">12:30 PM</button>
+            <button class="time-slot" onclick="selectSlot(this)" aria-pressed="false">1:00 PM</button>
+            <button class="time-slot" onclick="selectSlot(this)" aria-pressed="false">1:30 PM</button>
+            <button class="time-slot" onclick="selectSlot(this)" aria-pressed="false">2:00 PM</button>
+            <button class="time-slot unavailable" disabled aria-pressed="false">2:30 PM</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Payment -->
+    <div class="section-card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-num">3</div>
+          <div class="card-title">Payment Method</div>
+        </div>
+      </div>
+      <div class="card-content">
+        <div class="pay-tabs">
+          <button class="pay-tab active" onclick="switchPayTab('card', this)" aria-selected="true">💳 Card</button>
+          <button class="pay-tab" onclick="switchPayTab('upi', this)" aria-selected="false">💬 UPI</button>
+          <button class="pay-tab" onclick="switchPayTab('wallet', this)" aria-selected="false">👝 Wallet</button>
+          <button class="pay-tab" onclick="switchPayTab('cod', this)" aria-selected="false">📦 COD</button>
+        </div>
+
+        <!-- Card Panel -->
+        <div id="panel-card" class="pay-panel visible">
+          <div class="card-preview">
+            <div class="cp-number" id="cpNumber">•••• &nbsp; •••• &nbsp; •••• &nbsp; ••••</div>
+            <div class="cp-bottom">
+              <div class="cp-left">
+                <div class="cp-label">CARDHOLDER NAME</div>
+                <div class="cp-name" id="cpName">YOUR NAME</div>
+                <div class="cp-label" style="margin-top: 0.5rem;">EXPIRY</div>
+                <div class="cp-expiry" id="cpExpiry">MM / YY</div>
+              </div>
+              <div class="cp-network" id="cpNetwork">CARD</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Card Number</label>
+            <input type="text" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Expiry</label>
+              <input type="text" class="form-input" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">CVV</label>
+              <input type="text" class="form-input" placeholder="•••" maxlength="4">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Cardholder Name</label>
+            <input type="text" class="form-input" placeholder="Full name on card" oninput="updatePreviewName(this.value)">
+          </div>
+
+          <div class="section-card" style="margin-top: 1.5rem; background: var(--sage-pale); border: 1px solid var(--sage-light);">
+            <div class="card-content">
+              <div class="form-label">Or Use Saved Card</div>
+              <div class="saved-cards">
+                <div class="saved-card-row selected" onclick="selectSaved(this)" aria-checked="true">
+                  <div class="card-last4">💳 Visa ending in 4242</div>
+                  <div class="card-date">Expires 12/26</div>
+                </div>
+                <div class="saved-card-row" onclick="selectSaved(this)" aria-checked="false">
+                  <div class="card-last4">💳 Mastercard ending in 5555</div>
+                  <div class="card-date">Expires 08/25</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- UPI Panel -->
+        <div id="panel-upi" class="pay-panel">
+          <div class="form-group">
+            <label class="form-label">UPI ID</label>
+            <input type="text" id="upiId" class="form-input" placeholder="yourname@upi">
+          </div>
+          <div class="upi-verify">
+            <button class="verify-btn" onclick="verifyUPI()">Verify</button>
+          </div>
+        </div>
+
+        <!-- Wallet Panel -->
+        <div id="panel-wallet" class="pay-panel">
+          <div class="wallet-group">
+            <button class="wallet-btn selected" onclick="selectWallet(this)" aria-pressed="true">
+              <div class="wallet-icon">🍎</div>
+              <div class="wallet-name">Apple Pay</div>
+            </button>
+            <button class="wallet-btn" onclick="selectWallet(this)" aria-pressed="false">
+              <div class="wallet-icon">🔵</div>
+              <div class="wallet-name">Google Pay</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- COD Panel -->
+        <div id="panel-cod" class="pay-panel" style="display: none;">
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Pay securely with cash or card upon delivery. No additional charges.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Promo & Gift -->
+    <div class="section-card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-num">4</div>
+          <div class="card-title">Special Instructions</div>
+        </div>
+      </div>
+      <div class="card-content">
+        <div class="promo-section">
+          <div style="margin-bottom: 1rem; font-weight: 600; color: var(--brown-deep);">Have a promo code?</div>
+          <div class="promo-input-group">
+            <input type="text" id="promoInput" class="promo-input" placeholder="Enter code">
+            <button class="promo-btn" onclick="applyPromo()">Apply</button>
+          </div>
+          <div class="promo-success" id="promoSuccess"></div>
+        </div>
+
+        <div class="gift-toggle" onclick="toggleGift(this)" role="checkbox" aria-checked="false">
+          <div class="gift-checkbox">✓</div>
+          <div style="flex-grow: 1;">
+            <div style="font-weight: 600; color: var(--brown-deep);">Send as Gift</div>
+            <div style="font-size: 0.8rem; color: var(--text-light);">Add a personal message</div>
+          </div>
+        </div>
+
+        <div class="gift-note" id="giftNote">
+          <textarea class="gift-textarea" placeholder="Your message to the recipient..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Place Order -->
+    <button class="place-order-btn" id="placeOrderBtn" onclick="placeOrder()">
+      <span>🌿 Place Order · $44.50</span>
+    </button>
+  </div>
+
+  <!-- Right Column: Order Summary -->
+  <div class="order-summary-col">
+    <div class="summary-card">
+      <div class="summary-title">Order Summary</div>
+
+      <div class="summary-item">
+        <span>Lavender Cloud Latte</span>
+        <span>$6.50</span>
+      </div>
+      <div class="summary-item">
+        <span>Bloom Cold Brew</span>
+        <span>$7.00</span>
+      </div>
+      <div class="summary-item">
+        <span>Green Goddess Bowl</span>
+        <span>$12.50</span>
+      </div>
+      <div class="summary-item">
+        <span>Cardamom Rose Croissant</span>
+        <span>$4.75</span>
+      </div>
+      <div class="summary-item">
+        <span>Lemon Blueberry Scone</span>
+        <span>$4.25</span>
+      </div>
+
+      <div class="summary-item divider">
+        <span>Subtotal</span>
+        <span>$35.00</span>
+      </div>
+
+      <div class="summary-item">
+        <span>Delivery Fee</span>
+        <span>$3.25</span>
+      </div>
+
+      <div class="summary-item">
+        <span>Taxes</span>
+        <span>$6.25</span>
+      </div>
+
+      <div id="discountRow" class="summary-item" style="display: none;">
+        <span>Discount (<span id="appliedCode"></span>)</span>
+        <span id="discountAmt">−$6.00</span>
+      </div>
+
+      <div class="summary-item divider">
+        <span></span>
+        <span></span>
+      </div>
+
+      <div class="summary-total">
+        <span>Total</span>
+        <span id="grandTotalDisplay">$44.50</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-modal">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">Order Confirmed!</div>
+    <div class="success-subtitle">Your order has been placed successfully. Track your delivery below.</div>
+
+    <div class="eta-box">
+      <div class="eta-item">
+        <div class="eta-val"><span id="etaMinutes">28</span> min</div>
+        <div class="eta-label">Est. Delivery</div>
+      </div>
+      <div class="eta-item">
+        <div class="eta-val">#B4K7N2</div>
+        <div class="eta-label">Order ID</div>
+      </div>
+      <div class="eta-item">
+        <div class="eta-val">$44.50</div>
+        <div class="eta-label">Total charged</div>
+      </div>
+    </div>
+
+    <!-- Order tracker -->
+    <div class="tracker-steps" aria-label="Order tracking steps" role="list">
+      <div class="tracker-step done" role="listitem">
+        <div class="ts-dot" aria-label="Confirmed">✓</div>
+        <span class="ts-label">Order<br>Confirmed</span>
+      </div>
+      <div class="tracker-step active" role="listitem">
+        <div class="ts-dot" aria-label="Preparing">☕</div>
+        <span class="ts-label">Being<br>Prepared</span>
+      </div>
+      <div class="tracker-step" role="listitem">
+        <div class="ts-dot" aria-label="Ready">🌿</div>
+        <span class="ts-label">Ready for<br>Pickup</span>
+      </div>
+      <div class="tracker-step" role="listitem">
+        <div class="ts-dot" aria-label="On the way">🚴</div>
+        <span class="ts-label">On the<br>Way</span>
+      </div>
+      <div class="tracker-step" role="listitem">
+        <div class="ts-dot" aria-label="Delivered">🎉</div>
+        <span class="ts-label">Delivered</span>
+      </div>
+    </div>
+
+    <button class="track-btn" onclick="closeSuccess()" aria-label="Track your order">
+      📍 Track My Order
+    </button>
+  </div>
+</div>
+
+</div> <!-- end #checkoutPage -->
+
+<script>
+  // ===== STATE =====
+  let cart = [];
+  let currentModalItem = null;
+
+  const MENU = {
+    1:  { name: 'Lavender Cloud Latte',      price: 6.50,  img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=80&q=70' },
+    2:  { name: 'Bloom Cold Brew',            price: 7.00,  img: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=80&q=70' },
+    3:  { name: 'Spiced Hazelnut Flat White', price: 6.00,  img: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=80&q=70' },
+    4:  { name: 'Hibiscus Garden Tea',        price: 5.50,  img: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=80&q=70' },
+    5:  { name: 'Chamomile Dream Latte',      price: 5.75,  img: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=80&q=70' },
+    6:  { name: 'Cardamom Rose Croissant',    price: 4.75,  img: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=80&q=70' },
+    7:  { name: 'Lemon Blueberry Scone',      price: 4.25,  img: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=80&q=70' },
+    8:  { name: 'Green Goddess Bowl',         price: 12.50, img: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=80&q=70' },
+    9:  { name: 'Sunrise Açaí Bowl',          price: 13.00, img: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=80&q=70' },
+    10: { name: 'Garden Herb Tartine',        price: 14.00, img: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=80&q=70' },
+    11: { name: 'Seasonal Harvest Salad',     price: 15.50, img: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=80&q=70' },
+    12: { name: 'Smoked Mushroom Bowl',       price: 16.00, img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=80&q=70' },
+  };
+
+  // ===== PAGE NAVIGATION =====
+  function goToShop() {
+    document.getElementById('shopPage').classList.add('active');
+    document.getElementById('checkoutPage').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function goToCheckout() {
+    document.getElementById('shopPage').classList.remove('active');
+    document.getElementById('checkoutPage').classList.add('active');
+    document.body.style.overflow = '';
+  }
+
+  // ===== ADD TO CART =====
+  function addToCart(id, name, price, btn) {
+    const existing = cart.find(i => i.id === id);
+    if (existing) { existing.qty++; }
+    else { cart.push({ id, name, price, qty: 1 }); }
+
+    btn.classList.add('adding');
+    btn.textContent = '✓';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.classList.remove('adding');
+      btn.textContent = '+';
+      btn.disabled = false;
+    }, 600);
+
+    const card = btn.closest('.item-card');
+    card.classList.remove('added');
+    void card.offsetWidth;
+    card.classList.add('added');
+
+    updateCartUI();
+    showToast(`🌿 ${name} added!`);
+  }
+
+  // ===== UPDATE CART UI =====
+  function updateCartUI() {
+    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const count = cart.reduce((s, i) => s + i.qty, 0);
+    const grandTotal = total + 0.50;
+
+    const countEl = document.getElementById('cartCount');
+    countEl.textContent = count;
+    countEl.classList.remove('bounce');
+    void countEl.offsetWidth;
+    countEl.classList.add('bounce');
+    document.getElementById('cartBtn').setAttribute('aria-label', `Shopping cart, ${count} items`);
+
+    document.getElementById('subtotalVal').textContent  = '$' + total.toFixed(2);
+    document.getElementById('totalVal').innerHTML       = '<span>$' + grandTotal.toFixed(2) + '</span>';
+    document.getElementById('drawerSubtotalVal').textContent = '$' + total.toFixed(2);
+    document.getElementById('drawerTotalVal').innerHTML  = '<span>$' + grandTotal.toFixed(2) + '</span>';
+
+    const showCart = cart.length > 0;
+    document.getElementById('sidebarCartEmpty').style.display   = showCart ? 'none' : 'block';
+    document.getElementById('sidebarSubtotal').style.display    = showCart ? 'block' : 'none';
+    document.getElementById('drawerCartEmpty').style.display    = showCart ? 'none' : 'block';
+    document.getElementById('drawerSubtotal').style.display     = showCart ? 'block' : 'none';
+    document.getElementById('checkoutBtn').disabled             = !showCart;
+    document.getElementById('drawerCheckoutBtn').disabled       = !showCart;
+
+    renderCartItems('sidebarCartItems');
+    renderCartItems('drawerCartItems');
+  }
+
+  function renderCartItems(containerId) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    cart.forEach(item => {
+      const m = MENU[item.id];
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      div.innerHTML = `
+        <img src="${m.img}" alt="${item.name}" class="cart-item-thumb">
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+        </div>
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="changeQty(${item.id}, -1)" aria-label="Remove one ${item.name}">−</button>
+          <span class="qty-display" aria-label="Quantity: ${item.qty}">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${item.id}, 1)" aria-label="Add one ${item.name}">+</button>
+        </div>
+      `;
+      el.appendChild(div);
+    });
+  }
+
+  function changeQty(id, delta) {
+    const idx = cart.findIndex(i => i.id === id);
+    if (idx === -1) return;
+    cart[idx].qty += delta;
+    if (cart[idx].qty <= 0) cart.splice(idx, 1);
+    updateCartUI();
+  }
+
+  // ===== CATEGORY FILTER =====
+  function filterCategory(cat, btn) {
+    document.querySelectorAll('.cat-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+
+    document.querySelectorAll('.item-card').forEach(card => {
+      const show = cat === 'all' || card.dataset.category === cat;
+      card.style.display = show ? 'flex' : 'none';
+    });
+  }
+
+  // ===== TOAST =====
+  function showToast(msg) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 2600);
+  }
+
+  // ===== CUSTOMIZE MODAL =====
+  function openCustomize(id) {
+    currentModalItem = MENU[id];
+    document.getElementById('modalTitle').textContent = currentModalItem.name;
+    document.getElementById('modalSubtitle').textContent = 'Personalize it to your taste';
+    document.getElementById('modalAddBtn').textContent = `Add to Order → $${currentModalItem.price.toFixed(2)}`;
+    document.getElementById('modalOverlay').classList.add('open');
+    document.getElementById('modalAddBtn').dataset.id = id;
+    document.querySelector('#customizeModal').focus?.();
+  }
+
+  function closeCustomize() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    currentModalItem = null;
+  }
+
+  function addFromModal() {
+    if (!currentModalItem) return;
+    const id = parseInt(document.getElementById('modalAddBtn').dataset.id);
+    const item = MENU[id];
+    const existing = cart.find(i => i.id === id);
+    if (existing) existing.qty++;
+    else cart.push({ id, name: item.name, price: item.price, qty: 1 });
+    updateCartUI();
+    showToast(`🌿 ${item.name} added!`);
+    closeCustomize();
+  }
+
+  function selectChip(chip, group) {
+    chip.closest('.mod-options').querySelectorAll('.mod-chip').forEach(c => {
+      c.classList.remove('selected');
+      c.setAttribute('aria-pressed', 'false');
+    });
+    chip.classList.add('selected');
+    chip.setAttribute('aria-pressed', 'true');
+  }
+
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeCustomize();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeCustomize();
+      if (document.getElementById('cartDrawer').classList.contains('open')) toggleDrawer();
+    }
+  });
+
+  // ===== MOBILE DRAWER =====
+  function toggleDrawer() {
+    const drawer = document.getElementById('cartDrawer');
+    const overlay = document.getElementById('drawerOverlay');
+    const isOpen = drawer.classList.contains('open');
+    drawer.classList.toggle('open', !isOpen);
+    overlay.classList.toggle('open', !isOpen);
+    drawer.setAttribute('aria-hidden', isOpen ? 'true' : 'false');
+    document.body.style.overflow = isOpen ? '' : 'hidden';
+  }
+
+  // ===== CHECKOUT FUNCTIONS =====
+  function selectOption(el, group) {
+    document.querySelectorAll('.option-card').forEach(c => {
+      if (c.closest(`[role="radiogroup"]`) === el.closest(`[role="radiogroup"]`) || group) {
+        if (el.closest('.option-group') && c.closest('.option-group') === el.closest('.option-group')) {
+          c.classList.remove('selected'); c.setAttribute('aria-checked','false');
+        }
+      }
+    });
+    el.classList.add('selected'); el.setAttribute('aria-checked','true');
+
+    if (group === 'fulfil') {
+      const deliveryFields = document.getElementById('deliveryFields');
+      if (el === document.getElementById('opt-delivery') || el === document.getElementById('opt-schedule')) {
+        if (deliveryFields) deliveryFields.style.display = 'block';
+      } else {
+        if (deliveryFields) deliveryFields.style.display = 'none';
+      }
+    }
+  }
+
+  function selectSlot(btn) {
+    document.querySelectorAll('.time-slot').forEach(b => {
+      if (!b.classList.contains('unavailable')) {
+        b.classList.remove('selected'); b.setAttribute('aria-pressed','false');
+      }
+    });
+    btn.classList.add('selected'); btn.setAttribute('aria-pressed','true');
+  }
+
+  function switchPayTab(tab, btn) {
+    document.querySelectorAll('.pay-tab').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+    document.getElementById('panel-card').classList.remove('visible');
+    document.getElementById('panel-upi').classList.remove('visible');
+    document.getElementById('panel-wallet').classList.remove('visible');
+    document.getElementById('panel-cod').style.display = 'none';
+    document.getElementById('panel-card').style.display = 'none';
+    document.getElementById('panel-upi').style.display = 'none';
+    document.getElementById('panel-wallet').style.display = 'none';
+
+    if (tab === 'card')   { document.getElementById('panel-card').style.display='block'; document.getElementById('panel-card').classList.add('visible'); }
+    if (tab === 'upi')    { document.getElementById('panel-upi').style.display='block'; document.getElementById('panel-upi').classList.add('visible'); }
+    if (tab === 'wallet') { document.getElementById('panel-wallet').style.display='block'; document.getElementById('panel-wallet').classList.add('visible'); }
+    if (tab === 'cod')    { document.getElementById('panel-cod').style.display='block'; }
+  }
+
+  function formatCard(input) {
+    let v = input.value.replace(/\D/g,'').substring(0,16);
+    input.value = v.replace(/(.{4})/g,'$1 ').trim();
+    let display = v.padEnd(16,'•');
+    document.getElementById('cpNumber').innerHTML =
+      display.substring(0,4) + ' &nbsp; ' + display.substring(4,8) + ' &nbsp; ' + display.substring(8,12) + ' &nbsp; ' + display.substring(12,16);
+    const first = v[0];
+    document.getElementById('cpNetwork').textContent = first === '4' ? 'VISA' : first === '5' ? 'MASTERCARD' : first === '3' ? 'AMEX' : 'CARD';
+  }
+
+  function formatExpiry(input) {
+    let v = input.value.replace(/\D/g,'');
+    if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2,4);
+    input.value = v;
+    document.getElementById('cpExpiry').textContent = v || 'MM / YY';
+  }
+
+  function updatePreviewName(val) {
+    document.getElementById('cpName').textContent = val.toUpperCase() || 'YOUR NAME';
+  }
+
+  function selectSaved(el) {
+    document.querySelectorAll('.saved-card-row').forEach(r => {
+      r.classList.remove('selected'); r.setAttribute('aria-checked','false');
+    });
+    el.classList.add('selected'); el.setAttribute('aria-checked','true');
+  }
+
+  function selectWallet(btn) {
+    document.querySelectorAll('.wallet-btn').forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-pressed','false'); });
+    btn.classList.add('selected'); btn.setAttribute('aria-pressed','true');
+  }
+
+  function verifyUPI() {
+    const val = document.getElementById('upiId').value.trim();
+    if (!val || !val.includes('@')) { alert('Please enter a valid UPI ID (e.g. name@upi)'); return; }
+    const btn = document.querySelector('.verify-btn');
+    btn.textContent = '✓ Verified';
+    btn.style.background = 'var(--green-ok)';
+    setTimeout(() => { btn.textContent = 'Verify'; btn.style.background = ''; }, 3000);
+  }
+
+  const VALID_CODES = { 'BLOOM20': 20, 'FRESH10': 10, 'MORNING15': 15 };
+  let promoApplied = false;
+  function applyPromo() {
+    const code = document.getElementById('promoInput').value.trim().toUpperCase();
+    const successEl = document.getElementById('promoSuccess');
+    if (VALID_CODES[code]) {
+      document.getElementById('appliedCode').textContent = code;
+      successEl.innerHTML = `✅ Code <strong>${code}</strong> applied — ${VALID_CODES[code]}% off your order!`;
+      successEl.classList.add('show');
+      document.getElementById('discountRow').style.display = 'flex';
+      const discount = (38.25 * VALID_CODES[code] / 100).toFixed(2);
+      document.getElementById('discountAmt').textContent = '−$' + discount;
+      const newTotal = (44.50 - parseFloat(discount)).toFixed(2);
+      document.getElementById('grandTotalDisplay').textContent = '$' + newTotal;
+      document.getElementById('placeOrderBtn').querySelector('span').textContent = `🌿 Place Order · $${newTotal}`;
+      promoApplied = true;
+    } else {
+      successEl.innerHTML = '❌ Invalid code. Try BLOOM20 for 20% off!';
+      successEl.style.color = 'var(--red-soft)';
+      successEl.style.background = '#FFF0EE';
+      successEl.style.borderColor = '#FFCCCC';
+      successEl.classList.add('show');
+      setTimeout(() => { successEl.classList.remove('show'); successEl.style.color=''; successEl.style.background=''; successEl.style.borderColor=''; }, 3000);
+    }
+  }
+  document.getElementById('promoInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') applyPromo(); });
+
+  function toggleGift(el) {
+    const checked = el.classList.toggle('checked');
+    el.setAttribute('aria-checked', checked);
+    document.getElementById('giftNote').classList.toggle('show', checked);
+  }
+
+  function placeOrder() {
+    const btn = document.getElementById('placeOrderBtn');
+    btn.querySelector('span').textContent = '⏳ Processing…';
+    btn.disabled = true;
+    btn.style.opacity = '0.75';
+
+    setTimeout(() => {
+      document.getElementById('successOverlay').classList.add('show');
+      let eta = 28;
+      const etaEl = document.getElementById('etaMinutes');
+      const iv = setInterval(() => {
+        eta--;
+        if (eta <= 0) { clearInterval(iv); return; }
+        etaEl.textContent = eta;
+      }, 60000);
+    }, 1800);
+  }
+
+  function closeSuccess() {
+    document.getElementById('successOverlay').classList.remove('show');
+    const btn = document.getElementById('placeOrderBtn');
+    btn.querySelector('span').textContent = '🌿 Place Order · $44.50';
+    btn.disabled = false;
+    btn.style.opacity = '';
+  }
+
+  document.querySelectorAll('.option-card, .saved-card-row').forEach(card => {
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); } });
+  });
+
+  // ===== INIT =====
+  updateCartUI();
+</script>
+</body>
+</html>

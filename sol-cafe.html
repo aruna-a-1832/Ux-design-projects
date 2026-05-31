@@ -1,0 +1,2046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sol Café — Where Every Sip Finds Its Place</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400;1,600&family=Jost:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sol-cream: #F5EDD6;
+    --sol-warm: #EAD9B5;
+    --sol-brown: #6B4226;
+    --sol-dark: #2C1A0E;
+    --sol-gold: #C8922A;
+    --sol-green: #3D5A3E;
+    --sol-green-light: #5C7A5D;
+    --sol-orange: #D4622A;
+    --sol-text: #2C1A0E;
+    --sol-muted: #8A6F5A;
+    --sol-border: rgba(107,66,38,0.15);
+    --sol-shadow: rgba(44,26,14,0.12);
+    --radius: 16px;
+    --radius-lg: 24px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--sol-cream);
+    color: var(--sol-text);
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ─── CUSTOM CURSOR ─── */
+  .custom-cursor {
+    width: 14px; height: 14px;
+    background: var(--sol-gold);
+    border-radius: 50%;
+    position: fixed; top:0; left:0;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.15s ease, width 0.2s, height 0.2s, background 0.2s;
+    mix-blend-mode: multiply;
+  }
+  .custom-cursor.big { width:36px; height:36px; background: rgba(200,146,42,0.3); }
+
+  /* ─── PAGE SYSTEM ─── */
+  .page { display:none; min-height:100vh; animation: pageIn 0.5s ease; }
+  .page.active { display:block; }
+  @keyframes pageIn {
+    from { opacity:0; transform: translateY(18px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky; top:0; z-index:100;
+    background: rgba(245,237,214,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--sol-border);
+    padding: 0 40px;
+    display: flex; align-items:center; justify-content:space-between;
+    height: 68px;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight:800;
+    color: var(--sol-brown);
+    letter-spacing: -0.5px;
+    display:flex; align-items:center; gap:8px;
+    cursor:pointer;
+  }
+  .nav-logo span { color: var(--sol-gold); font-style:italic; }
+  .nav-links { display:flex; gap:6px; }
+  .nav-links button {
+    background:none; border:none;
+    font-family:'Jost',sans-serif;
+    font-size:13px; font-weight:500;
+    color: var(--sol-muted);
+    padding:8px 16px; border-radius:30px;
+    cursor:pointer; transition:all 0.2s;
+    letter-spacing:0.3px;
+  }
+  .nav-links button:hover, .nav-links button.active {
+    background: var(--sol-brown);
+    color: var(--sol-cream);
+  }
+  .nav-cta {
+    background: var(--sol-gold) !important;
+    color: #fff !important;
+    font-weight:600 !important;
+  }
+  .nav-cta:hover { background: var(--sol-brown) !important; }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:14px 28px; border-radius:50px;
+    font-family:'Jost',sans-serif; font-size:14px; font-weight:600;
+    border:none; cursor:pointer; transition:all 0.25s ease;
+    letter-spacing:0.4px; text-decoration:none;
+  }
+  .btn-primary {
+    background: var(--sol-brown); color: var(--sol-cream);
+    box-shadow: 0 4px 20px rgba(107,66,38,0.25);
+  }
+  .btn-primary:hover { background: var(--sol-dark); transform:translateY(-2px); box-shadow:0 8px 28px rgba(107,66,38,0.35); }
+  .btn-gold {
+    background: var(--sol-gold); color:#fff;
+    box-shadow: 0 4px 20px rgba(200,146,42,0.3);
+  }
+  .btn-gold:hover { background: #B07E20; transform:translateY(-2px); }
+  .btn-outline {
+    background:transparent; color:var(--sol-brown);
+    border: 2px solid var(--sol-brown);
+  }
+  .btn-outline:hover { background:var(--sol-brown); color:var(--sol-cream); }
+  .btn-green {
+    background: var(--sol-green); color:#fff;
+    box-shadow: 0 4px 20px rgba(61,90,62,0.25);
+  }
+  .btn-green:hover { background: #2d4330; transform:translateY(-2px); }
+  .btn-sm { padding:10px 20px; font-size:13px; }
+  .btn-lg { padding:18px 40px; font-size:16px; }
+
+  /* ─── FORM ELEMENTS ─── */
+  .form-group { margin-bottom:20px; }
+  .form-group label {
+    display:block; font-size:12px; font-weight:600;
+    color:var(--sol-brown); text-transform:uppercase;
+    letter-spacing:0.8px; margin-bottom:8px;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width:100%; padding:13px 16px;
+    border: 1.5px solid var(--sol-border);
+    border-radius:12px; background:#fff;
+    font-family:'Jost',sans-serif; font-size:14px;
+    color:var(--sol-text); outline:none;
+    transition:border-color 0.2s, box-shadow 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--sol-gold);
+    box-shadow: 0 0 0 3px rgba(200,146,42,0.1);
+  }
+  .form-group textarea { resize:vertical; min-height:80px; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+  /* ─── CARDS ─── */
+  .card {
+    background:#fff; border-radius:var(--radius-lg);
+    border: 1px solid var(--sol-border);
+    box-shadow: 0 2px 16px var(--sol-shadow);
+    overflow:hidden; transition:transform 0.25s, box-shadow 0.25s;
+  }
+  .card:hover { transform:translateY(-4px); box-shadow:0 12px 40px var(--sol-shadow); }
+
+  /* ─── SECTION HEADER ─── */
+  .section-header { text-align:center; margin-bottom:48px; }
+  .section-label {
+    font-size:11px; font-weight:600; letter-spacing:2px;
+    text-transform:uppercase; color:var(--sol-gold);
+    margin-bottom:12px; display:block;
+  }
+  .section-title {
+    font-family:'Playfair Display', serif;
+    font-size:clamp(28px,4vw,42px); font-weight:800;
+    color:var(--sol-dark); line-height:1.15;
+  }
+  .section-title em { color:var(--sol-gold); font-style:italic; }
+  .section-sub {
+    margin-top:14px; font-size:15px; color:var(--sol-muted);
+    font-weight:300; max-width:520px; margin-left:auto; margin-right:auto;
+    line-height:1.7;
+  }
+
+  /* ─── DECORATIVE ─── */
+  .divider {
+    width:60px; height:3px;
+    background: linear-gradient(90deg, var(--sol-gold), var(--sol-orange));
+    border-radius:2px; margin:16px auto 0;
+  }
+  .badge {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:5px 12px; border-radius:20px;
+    font-size:11px; font-weight:600; letter-spacing:0.5px;
+  }
+  .badge-green { background:rgba(61,90,62,0.1); color:var(--sol-green); border:1px solid rgba(61,90,62,0.2); }
+  .badge-gold { background:rgba(200,146,42,0.1); color:var(--sol-gold); border:1px solid rgba(200,146,42,0.2); }
+  .badge-orange { background:rgba(212,98,42,0.1); color:var(--sol-orange); border:1px solid rgba(212,98,42,0.2); }
+
+  /* ─── TOAST ─── */
+  #toast {
+    position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(80px);
+    background:var(--sol-dark); color:var(--sol-cream);
+    padding:14px 28px; border-radius:50px;
+    font-size:14px; font-weight:500;
+    box-shadow:0 8px 32px rgba(0,0,0,0.25);
+    transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    z-index:9999; white-space:nowrap;
+  }
+  #toast.show { transform:translateX(-50%) translateY(0); }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::after {
+    content:''; position:fixed; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:0; opacity:0.4;
+  }
+
+  /* ═══════════════════════════════════════════
+     PAGE 1: HOME
+  ═══════════════════════════════════════════ */
+  #page-home { background: var(--sol-cream); }
+
+  .hero {
+    min-height: calc(100vh - 68px);
+    display:grid; grid-template-columns:1fr 1fr;
+    align-items:center; gap:0;
+    padding:0;
+    position:relative; overflow:hidden;
+  }
+  .hero-left {
+    padding: 80px 60px 80px 80px;
+    position:relative; z-index:2;
+  }
+  .hero-eyebrow {
+    display:inline-flex; align-items:center; gap:10px;
+    background:rgba(200,146,42,0.1); border:1px solid rgba(200,146,42,0.25);
+    border-radius:30px; padding:6px 16px;
+    font-size:12px; font-weight:600; color:var(--sol-gold);
+    letter-spacing:0.5px; margin-bottom:28px;
+  }
+  .hero-dot { width:6px; height:6px; background:var(--sol-gold); border-radius:50%; animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.5;transform:scale(1.4);} }
+
+  .hero-title {
+    font-family:'Playfair Display', serif;
+    font-size: clamp(40px,5.5vw,68px);
+    font-weight:800; line-height:1.05;
+    color:var(--sol-dark);
+    margin-bottom:22px;
+  }
+  .hero-title em { color:var(--sol-gold); font-style:italic; display:block; }
+  .hero-subtitle {
+    font-size:16px; color:var(--sol-muted);
+    font-weight:300; line-height:1.75;
+    max-width:420px; margin-bottom:36px;
+  }
+  .hero-actions { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:48px; }
+  .hero-stats {
+    display:flex; gap:32px;
+    padding-top:32px;
+    border-top:1px solid var(--sol-border);
+  }
+  .stat { }
+  .stat-num {
+    font-family:'Playfair Display',serif;
+    font-size:32px; font-weight:800; color:var(--sol-brown);
+    line-height:1;
+  }
+  .stat-label { font-size:11px; color:var(--sol-muted); margin-top:4px; font-weight:500; letter-spacing:0.5px; }
+
+  .hero-right {
+    position:relative; height:100%;
+    background: linear-gradient(135deg, #3D5A3E 0%, #2d4330 50%, #1e2e21 100%);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .hero-img-overlay {
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse at 40% 50%, rgba(200,146,42,0.15) 0%, transparent 70%);
+  }
+  .cafe-illustration {
+    position:relative; z-index:1;
+    display:flex; flex-direction:column; align-items:center;
+    padding:60px;
+    text-align:center;
+  }
+  .cafe-icon-big {
+    font-size:90px; margin-bottom:24px;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.3));
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+  .cafe-tagline {
+    font-family:'Cormorant Garamond', serif;
+    font-size:28px; color:rgba(245,237,214,0.9);
+    font-style:italic; line-height:1.4; margin-bottom:32px;
+  }
+  .feature-pills { display:flex; flex-direction:column; gap:12px; width:100%; }
+  .feature-pill {
+    display:flex; align-items:center; gap:12px;
+    background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+    border-radius:14px; padding:12px 18px;
+    color:rgba(245,237,214,0.85); font-size:13px; font-weight:500;
+    transition:all 0.2s;
+  }
+  .feature-pill:hover { background:rgba(255,255,255,0.12); transform:translateX(4px); }
+  .feature-pill-icon { font-size:20px; }
+
+  /* QUICK ACTIONS SECTION */
+  .quick-actions-section {
+    padding:80px 80px;
+    background: var(--sol-dark);
+    position:relative; overflow:hidden;
+  }
+  .quick-actions-section::before {
+    content:''; position:absolute;
+    top:-100px; right:-100px;
+    width:400px; height:400px;
+    background: radial-gradient(circle, rgba(200,146,42,0.08) 0%, transparent 70%);
+    border-radius:50%;
+  }
+  .quick-grid {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:24px;
+    position:relative; z-index:1;
+  }
+  .quick-card {
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);
+    border-radius:var(--radius-lg); padding:36px 28px;
+    text-align:center; cursor:pointer;
+    transition:all 0.3s ease;
+    position:relative; overflow:hidden;
+  }
+  .quick-card::before {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(135deg, transparent, rgba(200,146,42,0.05));
+    opacity:0; transition:opacity 0.3s;
+  }
+  .quick-card:hover { background:rgba(255,255,255,0.09); transform:translateY(-6px); border-color:rgba(200,146,42,0.3); }
+  .quick-card:hover::before { opacity:1; }
+  .quick-icon { font-size:44px; margin-bottom:18px; display:block; }
+  .quick-title {
+    font-family:'Playfair Display',serif; font-size:20px; font-weight:600;
+    color:var(--sol-cream); margin-bottom:10px;
+  }
+  .quick-desc { font-size:13px; color:rgba(245,237,214,0.5); line-height:1.6; margin-bottom:20px; }
+  .quick-arrow {
+    width:36px; height:36px; border-radius:50%;
+    background:rgba(200,146,42,0.15); border:1px solid rgba(200,146,42,0.3);
+    display:inline-flex; align-items:center; justify-content:center;
+    color:var(--sol-gold); font-size:16px;
+    transition:all 0.2s;
+  }
+  .quick-card:hover .quick-arrow { background:var(--sol-gold); color:#fff; }
+
+  /* MENU PREVIEW */
+  .menu-preview-section { padding:80px 80px; background:var(--sol-cream); }
+  .menu-preview-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+  .menu-item-card {
+    background:#fff; border-radius:var(--radius);
+    border:1px solid var(--sol-border);
+    overflow:hidden; cursor:pointer;
+    transition:all 0.25s;
+  }
+  .menu-item-card:hover { transform:translateY(-4px); box-shadow:0 16px 40px var(--sol-shadow); }
+  .menu-item-img {
+    height:160px; display:flex; align-items:center; justify-content:center;
+    font-size:64px;
+    position:relative; overflow:hidden;
+  }
+  .menu-item-body { padding:16px; }
+  .menu-item-name { font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:var(--sol-dark); margin-bottom:4px; }
+  .menu-item-desc { font-size:12px; color:var(--sol-muted); margin-bottom:12px; line-height:1.5; }
+  .menu-item-footer { display:flex; justify-content:space-between; align-items:center; }
+  .menu-item-price { font-size:18px; font-weight:700; color:var(--sol-brown); }
+  .add-btn {
+    width:32px; height:32px; border-radius:50%;
+    background:var(--sol-gold); border:none; color:#fff;
+    font-size:18px; cursor:pointer; transition:all 0.2s;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .add-btn:hover { background:var(--sol-brown); transform:scale(1.1); }
+
+  /* ABOUT SECTION */
+  .about-section {
+    padding:80px 80px;
+    background: linear-gradient(135deg, #f9f4e8 0%, var(--sol-warm) 100%);
+    display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center;
+  }
+  .about-img-block {
+    position:relative; display:flex; justify-content:center; align-items:center;
+  }
+  .about-circle {
+    width:360px; height:360px; border-radius:50%;
+    background: linear-gradient(135deg, var(--sol-green) 0%, #2d4330 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:120px;
+    box-shadow: 0 30px 80px rgba(61,90,62,0.25);
+    animation:float 4s ease-in-out infinite;
+  }
+  .about-badge-float {
+    position:absolute; bottom:30px; right:20px;
+    background:#fff; border-radius:14px; padding:14px 18px;
+    box-shadow:0 8px 30px var(--sol-shadow);
+    border:1px solid var(--sol-border);
+    font-size:13px; font-weight:600; color:var(--sol-brown);
+    display:flex; align-items:center; gap:8px;
+  }
+
+  /* TESTIMONIALS */
+  .testimonials-section { padding:80px 80px; background:#fff; }
+  .testimonials-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+  .testimonial-card {
+    background:var(--sol-cream); border-radius:var(--radius);
+    padding:28px; border:1px solid var(--sol-border);
+    transition:all 0.25s;
+  }
+  .testimonial-card:hover { transform:translateY(-4px); box-shadow:0 12px 36px var(--sol-shadow); }
+  .testimonial-stars { color:var(--sol-gold); font-size:16px; margin-bottom:14px; letter-spacing:2px; }
+  .testimonial-text { font-family:'Cormorant Garamond',serif; font-size:17px; line-height:1.65; color:var(--sol-dark); margin-bottom:18px; font-style:italic; }
+  .testimonial-author { display:flex; align-items:center; gap:10px; }
+  .author-avatar { width:38px; height:38px; border-radius:50%; background:var(--sol-brown); display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .author-name { font-size:13px; font-weight:600; color:var(--sol-brown); }
+  .author-role { font-size:11px; color:var(--sol-muted); }
+
+  /* FOOTER */
+  footer {
+    background:var(--sol-dark); padding:48px 80px;
+    display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px;
+  }
+  .footer-brand-name {
+    font-family:'Playfair Display',serif; font-size:28px; font-weight:800;
+    color:var(--sol-cream); margin-bottom:12px;
+  }
+  .footer-brand-name span { color:var(--sol-gold); font-style:italic; }
+  .footer-tagline { font-size:13px; color:rgba(245,237,214,0.5); line-height:1.7; max-width:260px; }
+  .footer-col-title { font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--sol-gold); margin-bottom:16px; }
+  .footer-links { list-style:none; display:flex; flex-direction:column; gap:10px; }
+  .footer-links li a, .footer-links li button {
+    font-size:13px; color:rgba(245,237,214,0.6); text-decoration:none;
+    background:none; border:none; cursor:pointer; font-family:'Jost',sans-serif;
+    transition:color 0.2s; padding:0; text-align:left;
+  }
+  .footer-links li a:hover, .footer-links li button:hover { color:var(--sol-gold); }
+  .footer-bottom {
+    background:var(--sol-dark); border-top:1px solid rgba(255,255,255,0.06);
+    padding:20px 80px; display:flex; justify-content:space-between; align-items:center;
+  }
+  .footer-copy { font-size:12px; color:rgba(245,237,214,0.35); }
+
+  /* ═══════════════════════════════════════════
+     PAGE 2: ORDER
+  ═══════════════════════════════════════════ */
+  #page-order { background:var(--sol-cream); }
+
+  .page-header {
+    background: linear-gradient(135deg, var(--sol-brown), var(--sol-dark));
+    padding:48px 80px; color:var(--sol-cream);
+    position:relative; overflow:hidden;
+  }
+  .page-header::after {
+    content:''; position:absolute; right:-60px; top:-60px;
+    width:300px; height:300px; border-radius:50%;
+    background:rgba(200,146,42,0.08);
+  }
+  .page-header-inner { position:relative; z-index:1; }
+  .page-header-label { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--sol-gold); margin-bottom:10px; }
+  .page-header-title { font-family:'Playfair Display',serif; font-size:40px; font-weight:800; margin-bottom:10px; }
+  .page-header-sub { font-size:15px; color:rgba(245,237,214,0.65); font-weight:300; }
+
+  .order-layout {
+    display:grid; grid-template-columns:1fr 360px;
+    gap:32px; padding:40px 80px; align-items:start;
+    max-width:1400px; margin:0 auto;
+  }
+
+  /* CATEGORY TABS */
+  .category-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
+  .category-tab {
+    padding:9px 20px; border-radius:30px;
+    font-size:13px; font-weight:500;
+    border: 1.5px solid var(--sol-border);
+    background:#fff; color:var(--sol-muted);
+    cursor:pointer; transition:all 0.2s;
+    display:flex; align-items:center; gap:6px;
+  }
+  .category-tab.active, .category-tab:hover {
+    background:var(--sol-brown); color:var(--sol-cream);
+    border-color:var(--sol-brown);
+  }
+
+  /* MENU GRID */
+  .menu-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+  .order-item-card {
+    background:#fff; border-radius:var(--radius);
+    border:1px solid var(--sol-border); padding:18px;
+    display:flex; align-items:center; gap:16px;
+    cursor:pointer; transition:all 0.25s;
+    position:relative; overflow:hidden;
+  }
+  .order-item-card.selected { border-color:var(--sol-gold); box-shadow:0 0 0 3px rgba(200,146,42,0.12); }
+  .order-item-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px var(--sol-shadow); }
+  .order-item-emoji { font-size:44px; flex-shrink:0; }
+  .order-item-info { flex:1; }
+  .order-item-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:var(--sol-dark); margin-bottom:4px; }
+  .order-item-desc { font-size:11px; color:var(--sol-muted); line-height:1.5; margin-bottom:8px; }
+  .order-item-price { font-size:17px; font-weight:700; color:var(--sol-brown); }
+  .item-qty-control {
+    display:flex; align-items:center; gap:6px;
+  }
+  .qty-btn {
+    width:26px; height:26px; border-radius:50%;
+    border:1.5px solid var(--sol-border);
+    background:#fff; cursor:pointer; font-size:14px; font-weight:700;
+    color:var(--sol-brown); transition:all 0.2s;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .qty-btn:hover { background:var(--sol-brown); color:#fff; border-color:var(--sol-brown); }
+  .qty-num { font-size:14px; font-weight:600; color:var(--sol-dark); min-width:18px; text-align:center; }
+
+  /* ORDER CART */
+  .order-cart {
+    background:#fff; border-radius:var(--radius-lg);
+    border:1px solid var(--sol-border);
+    padding:28px; position:sticky; top:100px;
+    box-shadow:0 4px 24px var(--sol-shadow);
+  }
+  .cart-title { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--sol-dark); margin-bottom:20px; }
+  .cart-items { min-height:160px; margin-bottom:20px; }
+  .cart-empty { text-align:center; padding:32px 0; color:var(--sol-muted); font-size:13px; }
+  .cart-item {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; border-bottom:1px solid var(--sol-border);
+    font-size:13px;
+  }
+  .cart-item:last-child { border-bottom:none; }
+  .cart-item-name { font-weight:500; color:var(--sol-dark); }
+  .cart-item-sub { font-size:11px; color:var(--sol-muted); }
+  .cart-item-price { font-weight:600; color:var(--sol-brown); }
+  .cart-divider { border:none; border-top:2px solid var(--sol-border); margin:16px 0; }
+  .cart-total-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .cart-total-label { font-size:13px; color:var(--sol-muted); }
+  .cart-total-val { font-size:13px; color:var(--sol-dark); font-weight:500; }
+  .cart-grand-label { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--sol-dark); }
+  .cart-grand-val { font-size:22px; font-weight:800; color:var(--sol-brown); }
+
+  /* ═══════════════════════════════════════════
+     PAGE 3: TABLE BOOKING
+  ═══════════════════════════════════════════ */
+  #page-booking { background:var(--sol-cream); }
+  .booking-layout {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:40px; padding:40px 80px; align-items:start;
+    max-width:1200px; margin:0 auto;
+  }
+  .booking-form-card {
+    background:#fff; border-radius:var(--radius-lg);
+    padding:36px; border:1px solid var(--sol-border);
+    box-shadow:0 4px 24px var(--sol-shadow);
+  }
+  .booking-info-card {
+    background: linear-gradient(135deg, var(--sol-green), #2d4330);
+    border-radius:var(--radius-lg);
+    padding:36px; color:var(--sol-cream);
+    position:sticky; top:100px;
+  }
+  .info-item { display:flex; align-items:flex-start; gap:14px; margin-bottom:24px; }
+  .info-icon { font-size:24px; flex-shrink:0; margin-top:2px; }
+  .info-title { font-weight:600; font-size:14px; margin-bottom:4px; }
+  .info-desc { font-size:12px; color:rgba(245,237,214,0.65); line-height:1.6; }
+  .hours-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:24px; }
+  .hour-item { background:rgba(255,255,255,0.07); border-radius:10px; padding:12px; text-align:center; }
+  .hour-day { font-size:11px; color:rgba(245,237,214,0.55); margin-bottom:4px; }
+  .hour-time { font-size:13px; font-weight:600; }
+
+  /* ═══════════════════════════════════════════
+     PAGE 4: TABLES (Available spots)
+  ═══════════════════════════════════════════ */
+  #page-tables { background:var(--sol-cream); }
+  .tables-layout { padding:40px 80px; }
+  .filter-bar {
+    display:flex; gap:12px; flex-wrap:wrap; margin-bottom:32px;
+    padding:20px; background:#fff;
+    border-radius:var(--radius); border:1px solid var(--sol-border);
+  }
+  .filter-chip {
+    display:flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:30px;
+    font-size:12px; font-weight:500;
+    border:1.5px solid var(--sol-border);
+    background:var(--sol-cream); color:var(--sol-muted);
+    cursor:pointer; transition:all 0.2s;
+  }
+  .filter-chip.active { background:var(--sol-brown); color:#fff; border-color:var(--sol-brown); }
+
+  /* Floor Map */
+  .floor-map-section { margin-bottom:40px; }
+  .floor-map-title { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--sol-dark); margin-bottom:20px; }
+  .floor-map {
+    background:#fff; border-radius:var(--radius-lg);
+    border:1px solid var(--sol-border);
+    padding:32px; position:relative;
+    min-height:480px;
+    background-image:
+      linear-gradient(rgba(107,66,38,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(107,66,38,0.04) 1px, transparent 1px);
+    background-size:40px 40px;
+  }
+  .map-legend {
+    display:flex; gap:20px; flex-wrap:wrap; margin-bottom:24px;
+  }
+  .legend-item { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--sol-muted); }
+  .legend-dot { width:12px; height:12px; border-radius:3px; }
+  .legend-available { background:rgba(61,90,62,0.2); border:2px solid var(--sol-green); }
+  .legend-occupied { background:rgba(212,98,42,0.15); border:2px solid var(--sol-orange); }
+  .legend-selected { background:rgba(200,146,42,0.2); border:2px solid var(--sol-gold); }
+  .legend-accessible { background:rgba(107,66,38,0.1); border:2px solid var(--sol-brown); }
+
+  /* Zone labels */
+  .zone-label {
+    position:absolute; font-size:10px; font-weight:600;
+    letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--sol-muted); opacity:0.6;
+  }
+
+  .table-spot {
+    position:absolute; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    transition:all 0.2s;
+  }
+  .table-spot:hover { transform:scale(1.08); }
+  .table-shape {
+    border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-size:18px; font-weight:700;
+    position:relative; transition:all 0.2s;
+  }
+  .table-shape.available {
+    background:rgba(61,90,62,0.12); border:2px solid var(--sol-green);
+    color:var(--sol-green);
+  }
+  .table-shape.occupied {
+    background:rgba(212,98,42,0.1); border:2px dashed var(--sol-orange);
+    color:var(--sol-orange); cursor:not-allowed; opacity:0.7;
+  }
+  .table-shape.selected {
+    background:rgba(200,146,42,0.2); border:2.5px solid var(--sol-gold);
+    color:var(--sol-gold);
+    box-shadow:0 0 0 4px rgba(200,146,42,0.15);
+  }
+  .table-shape.accessible {
+    background:rgba(107,66,38,0.08); border:2px solid var(--sol-brown);
+    color:var(--sol-brown);
+  }
+  .table-label { font-size:10px; font-weight:600; color:var(--sol-muted); }
+
+  /* AMENITY ICONS on table */
+  .table-amenities { display:flex; gap:2px; margin-top:2px; }
+  .amenity-icon { font-size:10px; }
+
+  /* Table detail sidebar */
+  .table-detail-sidebar {
+    background:#fff; border-radius:var(--radius-lg);
+    padding:28px; border:1px solid var(--sol-border);
+    box-shadow:0 4px 24px var(--sol-shadow);
+    margin-top:32px;
+  }
+  .amenity-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0; }
+  .amenity-card {
+    background:var(--sol-cream); border-radius:12px; padding:14px;
+    text-align:center; border:1px solid var(--sol-border);
+  }
+  .amenity-card-icon { font-size:24px; margin-bottom:6px; }
+  .amenity-card-label { font-size:11px; color:var(--sol-muted); font-weight:500; }
+
+  /* ═══════════════════════════════════════════
+     PAGE 5: PAYMENT
+  ═══════════════════════════════════════════ */
+  #page-payment { background:var(--sol-cream); }
+  .payment-layout {
+    display:grid; grid-template-columns:1.2fr 1fr;
+    gap:40px; padding:40px 80px; align-items:start;
+    max-width:1200px; margin:0 auto;
+  }
+  .payment-form-card {
+    background:#fff; border-radius:var(--radius-lg);
+    padding:36px; border:1px solid var(--sol-border);
+    box-shadow:0 4px 24px var(--sol-shadow);
+  }
+  .payment-section-title { font-family:'Playfair Display',serif; font-size:16px; font-weight:700; color:var(--sol-dark); margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--sol-border); }
+  .payment-methods { display:flex; gap:12px; margin-bottom:24px; }
+  .pay-method {
+    flex:1; padding:16px 12px; border-radius:12px;
+    border:2px solid var(--sol-border); cursor:pointer;
+    text-align:center; transition:all 0.2s;
+  }
+  .pay-method.active { border-color:var(--sol-gold); background:rgba(200,146,42,0.05); }
+  .pay-method-icon { font-size:24px; margin-bottom:6px; display:block; }
+  .pay-method-label { font-size:12px; font-weight:500; color:var(--sol-muted); }
+  .pay-method.active .pay-method-label { color:var(--sol-gold); }
+  .card-number-display {
+    background:linear-gradient(135deg,var(--sol-brown),var(--sol-dark));
+    border-radius:16px; padding:28px; margin-bottom:24px; color:#fff;
+    position:relative; overflow:hidden;
+  }
+  .card-number-display::after {
+    content:''; position:absolute; top:-30px; right:-30px;
+    width:120px; height:120px; border-radius:50%;
+    background:rgba(200,146,42,0.15);
+  }
+  .card-chip { font-size:24px; margin-bottom:14px; }
+  .card-num-text { letter-spacing:3px; font-size:16px; font-family:monospace; margin-bottom:16px; opacity:0.9; }
+  .card-meta { display:flex; gap:24px; font-size:12px; opacity:0.65; }
+  .order-summary-card {
+    background:#fff; border-radius:var(--radius-lg);
+    padding:28px; border:1px solid var(--sol-border);
+    box-shadow:0 4px 24px var(--sol-shadow);
+    position:sticky; top:100px;
+  }
+  .summary-section { margin-bottom:20px; }
+  .summary-row { display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; }
+  .summary-row.total { font-size:16px; font-weight:700; color:var(--sol-dark); padding-top:12px; border-top:2px solid var(--sol-border); margin-top:4px; }
+
+  /* ═══════════════════════════════════════════
+     PAGE 6: CONFIRMATION
+  ═══════════════════════════════════════════ */
+  #page-confirm { background:var(--sol-cream); }
+  .confirm-wrapper {
+    min-height:calc(100vh - 68px);
+    display:flex; align-items:center; justify-content:center;
+    padding:60px 40px;
+  }
+  .confirm-card {
+    background:#fff; border-radius:32px;
+    padding:60px 52px; max-width:620px; width:100%;
+    text-align:center;
+    border:1px solid var(--sol-border);
+    box-shadow:0 20px 80px rgba(44,26,14,0.12);
+    position:relative; overflow:hidden;
+  }
+  .confirm-card::before {
+    content:''; position:absolute; top:-60px; left:50%; transform:translateX(-50%);
+    width:200px; height:200px; border-radius:50%;
+    background:radial-gradient(circle, rgba(200,146,42,0.08) 0%, transparent 70%);
+  }
+  .confirm-tick {
+    width:80px; height:80px; border-radius:50%;
+    background:linear-gradient(135deg,var(--sol-green),#2d4330);
+    display:flex; align-items:center; justify-content:center;
+    font-size:36px; margin:0 auto 28px;
+    box-shadow:0 12px 40px rgba(61,90,62,0.3);
+    animation:confirmPop 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes confirmPop {
+    from { transform:scale(0); opacity:0; }
+    to { transform:scale(1); opacity:1; }
+  }
+  .confirm-title {
+    font-family:'Playfair Display',serif;
+    font-size:36px; font-weight:800; color:var(--sol-dark); margin-bottom:12px;
+  }
+  .confirm-sub { font-size:15px; color:var(--sol-muted); margin-bottom:36px; line-height:1.7; }
+  .confirm-details {
+    background:var(--sol-cream); border-radius:16px;
+    padding:24px; margin-bottom:32px; text-align:left;
+    border:1px solid var(--sol-border);
+  }
+  .confirm-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; border-bottom:1px solid var(--sol-border);
+    font-size:14px;
+  }
+  .confirm-row:last-child { border-bottom:none; }
+  .confirm-row-label { color:var(--sol-muted); font-weight:500; }
+  .confirm-row-val { font-weight:600; color:var(--sol-dark); }
+  .confirm-code {
+    background:linear-gradient(135deg,var(--sol-brown),var(--sol-dark));
+    color:var(--sol-cream); border-radius:12px;
+    padding:14px 28px; display:inline-block;
+    font-family:monospace; font-size:22px; font-weight:700;
+    letter-spacing:4px; margin-bottom:32px;
+  }
+  .confirm-actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+
+  /* ─── MISC / RESPONSIVE HELPERS ─── */
+  .container { max-width:1400px; margin:0 auto; }
+
+  @media (max-width: 900px) {
+    nav { padding:0 20px; }
+    .nav-links { display:none; }
+    .hero { grid-template-columns:1fr; }
+    .hero-right { display:none; }
+    .hero-left { padding:40px 20px; }
+    .quick-actions-section, .menu-preview-section, .about-section, .testimonials-section, footer { padding:40px 20px; }
+    .quick-grid, .menu-preview-grid, .testimonials-grid { grid-template-columns:1fr; }
+    .about-section, .order-layout, .booking-layout, .payment-layout { grid-template-columns:1fr; padding:20px; }
+    .tables-layout { padding:20px; }
+    footer { grid-template-columns:1fr; }
+    .footer-bottom { padding:20px; flex-direction:column; gap:10px; }
+    .page-header { padding:32px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="custom-cursor" id="cursor"></div>
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════
+     NAVIGATION
+═══════════════════════════════ -->
+<nav id="main-nav">
+  <div class="nav-logo" onclick="showPage('home')">
+    <span>Sol</span> Café
+  </div>
+  <div class="nav-links">
+    <button onclick="showPage('home')" class="active" id="nav-home">Home</button>
+    <button onclick="showPage('order')" id="nav-order">Order Now</button>
+    <button onclick="showPage('tables')" id="nav-tables">View Tables</button>
+    <button onclick="showPage('booking')" id="nav-booking">Book a Table</button>
+    <button onclick="showPage('order')" class="nav-cta btn btn-gold btn-sm">Start Order ☕</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════
+     PAGE: HOME
+═══════════════════════════════ -->
+<div id="page-home" class="page active">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <div class="hero-dot"></div>
+        Open Now · University District
+      </div>
+      <h1 class="hero-title">
+        Where Focus<br>Meets
+        <em>Good Coffee</em>
+      </h1>
+      <p class="hero-subtitle">Sol Café is your neighborhood's warmest corner — dedicated study zones, pre-ordering to skip the queue, and a table that's always ready for you.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-lg" onclick="showPage('order')">☕ Order Ahead</button>
+        <button class="btn btn-outline btn-lg" onclick="showPage('booking')">📅 Book a Table</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">18</div>
+          <div class="stat-label">Study Spots</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">12</div>
+          <div class="stat-label">Power Outlets</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">4.9</div>
+          <div class="stat-label">Avg Rating</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">0</div>
+          <div class="stat-label">Min Queue (pre-order)</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-img-overlay"></div>
+      <div class="cafe-illustration">
+        <div class="cafe-icon-big">☕</div>
+        <p class="cafe-tagline">"Your second home,<br>your best ideas."</p>
+        <div class="feature-pills">
+          <div class="feature-pill">
+            <span class="feature-pill-icon">💻</span>
+            Laptop-friendly tables with USB & power
+          </div>
+          <div class="feature-pill">
+            <span class="feature-pill-icon">📚</span>
+            Quiet study zones for deep work
+          </div>
+          <div class="feature-pill">
+            <span class="feature-pill-icon">♿</span>
+            Accessible seating for elderly & mobility needs
+          </div>
+          <div class="feature-pill">
+            <span class="feature-pill-icon">🚀</span>
+            Order ahead — ready when you arrive
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK ACTIONS -->
+  <section class="quick-actions-section">
+    <div class="section-header" style="margin-bottom:40px;">
+      <span class="section-label" style="color:rgba(200,146,42,0.8);">Everything you need</span>
+      <h2 class="section-title" style="color:var(--sol-cream);">Skip the queue, <em>own your day</em></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="quick-grid">
+      <div class="quick-card" onclick="showPage('order')">
+        <span class="quick-icon">🛍️</span>
+        <h3 class="quick-title">Pre-Order & Pick Up</h3>
+        <p class="quick-desc">Browse our full menu, add to cart, and pay online. Your order is ready the moment you step in.</p>
+        <div class="quick-arrow">→</div>
+      </div>
+      <div class="quick-card" onclick="showPage('booking')">
+        <span class="quick-icon">📅</span>
+        <h3 class="quick-title">Reserve Your Table</h3>
+        <p class="quick-desc">No more waiting at the door. Lock in a spot — study zone, window seat, or group table — days in advance.</p>
+        <div class="quick-arrow">→</div>
+      </div>
+      <div class="quick-card" onclick="showPage('tables')">
+        <span class="quick-icon">🗺️</span>
+        <h3 class="quick-title">View Live Availability</h3>
+        <p class="quick-desc">See our full floor plan in real-time. Filter by charging ports, quiet zones, or accessible seating.</p>
+        <div class="quick-arrow">→</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU PREVIEW -->
+  <section class="menu-preview-section">
+    <div class="section-header">
+      <span class="section-label">Our Favourites</span>
+      <h2 class="section-title">Crafted with <em>love</em></h2>
+      <p class="section-sub">Every cup, every plate — made fresh for you. Student-friendly prices, neighbourhood-quality taste.</p>
+      <div class="divider"></div>
+    </div>
+    <div class="menu-preview-grid">
+      <div class="menu-item-card" onclick="showPage('order')">
+        <div class="menu-item-img" style="background:linear-gradient(135deg,#f9e4c8,#f0d5a8);">☕</div>
+        <div class="menu-item-body">
+          <div class="menu-item-name">Sol Signature Latte</div>
+          <div class="menu-item-desc">Double shot, oat milk, brown sugar</div>
+          <div class="menu-item-footer">
+            <span class="menu-item-price">£3.80</span>
+            <button class="add-btn" onclick="event.stopPropagation();addToCartQuick('Sol Signature Latte',3.80)">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="menu-item-card" onclick="showPage('order')">
+        <div class="menu-item-img" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">🥐</div>
+        <div class="menu-item-body">
+          <div class="menu-item-name">Butter Croissant</div>
+          <div class="menu-item-desc">Freshly baked, flaky & golden</div>
+          <div class="menu-item-footer">
+            <span class="menu-item-price">£2.50</span>
+            <button class="add-btn" onclick="event.stopPropagation();addToCartQuick('Butter Croissant',2.50)">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="menu-item-card" onclick="showPage('order')">
+        <div class="menu-item-img" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);">🫖</div>
+        <div class="menu-item-body">
+          <div class="menu-item-name">Chamomile Gold Tea</div>
+          <div class="menu-item-desc">Honey & lavender blend, hot or iced</div>
+          <div class="menu-item-footer">
+            <span class="menu-item-price">£2.90</span>
+            <button class="add-btn" onclick="event.stopPropagation();addToCartQuick('Chamomile Gold Tea',2.90)">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="menu-item-card" onclick="showPage('order')">
+        <div class="menu-item-img" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0);">🍰</div>
+        <div class="menu-item-body">
+          <div class="menu-item-name">Cardamom Cake Slice</div>
+          <div class="menu-item-desc">House recipe, baked daily</div>
+          <div class="menu-item-footer">
+            <span class="menu-item-price">£3.50</span>
+            <button class="add-btn" onclick="event.stopPropagation();addToCartQuick('Cardamom Cake Slice',3.50)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:32px;">
+      <button class="btn btn-primary" onclick="showPage('order')">View Full Menu →</button>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-section">
+    <div class="about-img-block">
+      <div class="about-circle">🌞</div>
+      <div class="about-badge-float">
+        <span style="font-size:20px;">⭐</span>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--sol-brown);">4.9 / 5</div>
+          <div style="font-size:11px;color:var(--sol-muted);">1,200+ Reviews</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <span class="section-label">Our Story</span>
+      <h2 class="section-title">Sol was born for<br><em>this neighbourhood</em></h2>
+      <div class="divider" style="margin-left:0;"></div>
+      <p style="margin-top:24px;font-size:15px;color:var(--sol-muted);line-height:1.8;margin-bottom:20px;">We started Sol Café because we knew the struggle — students pulling all-nighters with nowhere warm to sit, elderly neighbours wanting a calm place to read, young professionals needing fast coffee without the queue. Sol is the answer to all of it.</p>
+      <p style="font-size:15px;color:var(--sol-muted);line-height:1.8;margin-bottom:32px;">Every table is designed with purpose. Study zones come with power outlets, USB charging, and desk lamps. We have dedicated accessible seating near the entrance, and a quiet corner that feels like your own office.</p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        <div class="badge badge-green">♿ Fully Accessible</div>
+        <div class="badge badge-gold">💻 Laptop Zones</div>
+        <div class="badge badge-orange">☕ Specialty Coffee</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials-section">
+    <div class="section-header">
+      <span class="section-label">Guest Stories</span>
+      <h2 class="section-title">Loved by <em>everyone</em></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"I book my study spot every morning before my 9am. By the time I arrive, my latte is waiting. Sol has genuinely changed my uni life."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">👩</div>
+          <div>
+            <div class="author-name">Priya M.</div>
+            <div class="author-role">University Student</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"The accessible seating near the entrance and the lovely staff make me feel so welcome. It's my daily outing and I wouldn't change it."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">👴</div>
+          <div>
+            <div class="author-name">Arthur B.</div>
+            <div class="author-role">Local Resident, 73</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"The pre-order feature alone is worth it. I'm in and out in 3 minutes when I'm between lectures. Best café near campus, no question."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">👨</div>
+          <div>
+            <div class="author-name">James T.</div>
+            <div class="author-role">Postgrad Student</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>
+      <div class="footer-brand-name"><span>Sol</span> Café</div>
+      <p class="footer-tagline">Your neighbourhood's warmest corner. Where every sip finds its place and every student finds their focus.</p>
+      <div style="margin-top:20px;display:flex;gap:12px;">
+        <span style="font-size:20px;cursor:pointer;" title="Instagram">📸</span>
+        <span style="font-size:20px;cursor:pointer;" title="Twitter">🐦</span>
+        <span style="font-size:20px;cursor:pointer;" title="Facebook">📘</span>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Navigate</div>
+      <ul class="footer-links">
+        <li><button onclick="showPage('home')">Home</button></li>
+        <li><button onclick="showPage('order')">Order Now</button></li>
+        <li><button onclick="showPage('booking')">Book a Table</button></li>
+        <li><button onclick="showPage('tables')">View Tables</button></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Hours</div>
+      <ul class="footer-links">
+        <li><a>Mon–Fri: 7am–9pm</a></li>
+        <li><a>Saturday: 8am–8pm</a></li>
+        <li><a>Sunday: 9am–6pm</a></li>
+        <li><a style="color:var(--sol-gold);">Kitchen closes 30min early</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Contact</div>
+      <ul class="footer-links">
+        <li><a>📍 12 Campus Road, City</a></li>
+        <li><a>📞 +44 20 1234 5678</a></li>
+        <li><a>✉️ hello@solcafe.co.uk</a></li>
+        <li><a>🅿️ Free parking available</a></li>
+      </ul>
+    </div>
+  </footer>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 Sol Café. All rights reserved.</span>
+    <span class="footer-copy">Made with ☕ for the community</span>
+  </div>
+
+</div><!-- END HOME -->
+
+<!-- ═══════════════════════════════
+     PAGE: ORDER
+═══════════════════════════════ -->
+<div id="page-order" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="page-header-label">Sol Café Menu</div>
+      <h1 class="page-header-title">Order Ahead ☕</h1>
+      <p class="page-header-sub">Choose your items — pay now, skip the queue. Your order will be ready when you arrive.</p>
+    </div>
+  </div>
+
+  <div class="order-layout">
+    <!-- LEFT: MENU -->
+    <div>
+      <div class="category-tabs" id="categoryTabs">
+        <div class="category-tab active" onclick="filterMenu('all',this)">☕ All Items</div>
+        <div class="category-tab" onclick="filterMenu('drinks',this)">🥤 Drinks</div>
+        <div class="category-tab" onclick="filterMenu('hot',this)">♨️ Hot Drinks</div>
+        <div class="category-tab" onclick="filterMenu('food',this)">🥐 Food</div>
+        <div class="category-tab" onclick="filterMenu('vegan',this)">🌱 Vegan</div>
+        <div class="category-tab" onclick="filterMenu('sweet',this)">🍰 Sweet</div>
+      </div>
+      <div class="menu-grid" id="menuGrid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- RIGHT: CART -->
+    <div class="order-cart">
+      <div class="cart-title">🛒 Your Order</div>
+      <div class="cart-items" id="cartItems">
+        <div class="cart-empty" id="cartEmpty">
+          <div style="font-size:40px;margin-bottom:12px;">☕</div>
+          <div>Your cart is empty.<br>Add items from the menu!</div>
+        </div>
+      </div>
+      <hr class="cart-divider">
+      <div class="cart-total-row">
+        <span class="cart-total-label">Subtotal</span>
+        <span class="cart-total-val" id="cartSubtotal">£0.00</span>
+      </div>
+      <div class="cart-total-row">
+        <span class="cart-total-label">Service (0%)</span>
+        <span class="cart-total-val">£0.00</span>
+      </div>
+      <div class="cart-total-row" style="margin-top:8px;">
+        <span class="cart-grand-label">Total</span>
+        <span class="cart-grand-val" id="cartTotal">£0.00</span>
+      </div>
+
+      <!-- Pickup time -->
+      <div style="margin:20px 0;">
+        <div class="form-group">
+          <label>Pick-up Time</label>
+          <select id="pickupTime">
+            <option>As soon as possible (~10 min)</option>
+            <option>In 20 minutes</option>
+            <option>In 30 minutes</option>
+            <option>In 45 minutes</option>
+            <option>In 1 hour</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Name for order</label>
+          <input type="text" id="orderName" placeholder="Your first name">
+        </div>
+      </div>
+
+      <button class="btn btn-gold" style="width:100%;" onclick="proceedToPayment('order')">
+        Proceed to Payment →
+      </button>
+      <button class="btn btn-outline btn-sm" style="width:100%;margin-top:10px;" onclick="showPage('booking')">
+        + Also Book a Table
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     PAGE: BOOKING
+═══════════════════════════════ -->
+<div id="page-booking" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="page-header-label">Reserve Your Spot</div>
+      <h1 class="page-header-title">Book a Table 📅</h1>
+      <p class="page-header-sub">Guarantee your seat before you arrive. Study spots, cosy corners, and group tables available.</p>
+    </div>
+  </div>
+
+  <div class="booking-layout">
+    <!-- FORM -->
+    <div class="booking-form-card">
+      <h2 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:24px;color:var(--sol-dark);">Your Reservation Details</h2>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="bookFirstName" placeholder="Jane">
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="bookLastName" placeholder="Smith">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="bookEmail" placeholder="jane@university.ac.uk">
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="bookPhone" placeholder="+44 07123 456789">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="bookDate">
+        </div>
+        <div class="form-group">
+          <label>Time</label>
+          <select id="bookTime">
+            <option>7:00 AM</option><option>7:30 AM</option><option>8:00 AM</option>
+            <option>8:30 AM</option><option>9:00 AM</option><option>9:30 AM</option>
+            <option>10:00 AM</option><option>10:30 AM</option><option>11:00 AM</option>
+            <option>11:30 AM</option><option>12:00 PM</option><option>12:30 PM</option>
+            <option>1:00 PM</option><option>2:00 PM</option><option>3:00 PM</option>
+            <option>4:00 PM</option><option>5:00 PM</option><option>6:00 PM</option>
+            <option>7:00 PM</option><option>8:00 PM</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Number of Guests</label>
+          <select id="bookGuests">
+            <option>1 person</option><option>2 people</option><option>3 people</option>
+            <option>4 people</option><option>5 people</option><option>6 people</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Duration</label>
+          <select id="bookDuration">
+            <option>1 hour</option><option>1.5 hours</option><option>2 hours</option>
+            <option>2.5 hours</option><option>3 hours</option><option>3+ hours</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Table Preference</label>
+        <select id="bookTablePref">
+          <option>Study Zone (quiet, power outlets)</option>
+          <option>Window Seat (natural light)</option>
+          <option>Group Table (sofa seating)</option>
+          <option>Accessible Seating (near entrance)</option>
+          <option>Outdoor / Patio</option>
+          <option>No preference</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Special Requirements</label>
+        <textarea id="bookNotes" placeholder="e.g. wheelchair access, extra chairs, celebrating something special..."></textarea>
+      </div>
+
+      <!-- Accessibility options -->
+      <div style="background:var(--sol-cream);border-radius:12px;padding:16px;margin-bottom:20px;border:1px solid var(--sol-border);">
+        <div style="font-size:12px;font-weight:600;color:var(--sol-brown);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;">Accessibility & Special Needs</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--sol-muted);text-transform:none;letter-spacing:0;">
+            <input type="checkbox" id="acc-wheelchair" style="width:16px;height:16px;accent-color:var(--sol-gold);"> ♿ Wheelchair / mobility aid access needed
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--sol-muted);text-transform:none;letter-spacing:0;">
+            <input type="checkbox" id="acc-elderly" style="width:16px;height:16px;accent-color:var(--sol-gold);"> 👴 Elderly-friendly seating (low entry, armrests)
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--sol-muted);text-transform:none;letter-spacing:0;">
+            <input type="checkbox" id="acc-pram" style="width:16px;height:16px;accent-color:var(--sol-gold);"> 🍼 Pram / buggy space required
+          </label>
+        </div>
+      </div>
+
+      <button class="btn btn-gold" style="width:100%;" onclick="proceedToPayment('booking')">
+        Confirm Reservation →
+      </button>
+      <p style="font-size:11px;color:var(--sol-muted);text-align:center;margin-top:12px;">£1.00 deposit to confirm. Refunded on arrival. No shows forfeit deposit.</p>
+    </div>
+
+    <!-- INFO SIDEBAR -->
+    <div class="booking-info-card">
+      <h3 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:24px;">What to Expect</h3>
+
+      <div class="info-item">
+        <span class="info-icon">✅</span>
+        <div>
+          <div class="info-title">Instant Confirmation</div>
+          <div class="info-desc">You'll receive an email confirmation with your booking code and a QR to show at the door.</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">💻</span>
+        <div>
+          <div class="info-title">Study Zone Perks</div>
+          <div class="info-desc">Every study-zone booking includes a reserved power outlet and complimentary 5-min grace period.</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">♿</span>
+        <div>
+          <div class="info-title">Accessible Entry</div>
+          <div class="info-desc">We have step-free access, accessible bathrooms, and priority seating near the entrance for elderly and mobility needs.</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">🔔</span>
+        <div>
+          <div class="info-title">Reminder Texts</div>
+          <div class="info-desc">We'll send you a reminder 30 minutes before your reservation, and message when your table is ready.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.12);padding-top:20px;">
+        <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,237,214,0.5);margin-bottom:14px;">Opening Hours</div>
+        <div class="hours-grid">
+          <div class="hour-item"><div class="hour-day">Mon–Fri</div><div class="hour-time">7am–9pm</div></div>
+          <div class="hour-item"><div class="hour-day">Saturday</div><div class="hour-time">8am–8pm</div></div>
+          <div class="hour-item"><div class="hour-day">Sunday</div><div class="hour-time">9am–6pm</div></div>
+          <div class="hour-item"><div class="hour-day">Bank Hols</div><div class="hour-time">10am–5pm</div></div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;text-align:center;">
+        <button class="btn btn-outline" style="border-color:rgba(245,237,214,0.4);color:var(--sol-cream);width:100%;" onclick="showPage('tables')">
+          🗺️ View Table Map First
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     PAGE: TABLES
+═══════════════════════════════ -->
+<div id="page-tables" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="page-header-label">Live Floor Plan</div>
+      <h1 class="page-header-title">Available Tables 🗺️</h1>
+      <p class="page-header-sub">Click any green table to view its amenities and book. Updated in real-time.</p>
+    </div>
+  </div>
+
+  <div class="tables-layout">
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <span style="font-size:12px;font-weight:600;color:var(--sol-muted);text-transform:uppercase;letter-spacing:0.8px;margin-right:8px;">Filter:</span>
+      <div class="filter-chip active" onclick="toggleFilter(this,'all')">🪑 All Tables</div>
+      <div class="filter-chip" onclick="toggleFilter(this,'power')">🔌 Power Outlets</div>
+      <div class="filter-chip" onclick="toggleFilter(this,'usb')">📱 USB Charging</div>
+      <div class="filter-chip" onclick="toggleFilter(this,'quiet')">🔇 Quiet Zone</div>
+      <div class="filter-chip" onclick="toggleFilter(this,'accessible')">♿ Accessible</div>
+      <div class="filter-chip" onclick="toggleFilter(this,'window')">🌅 Window Seat</div>
+      <div class="filter-chip" onclick="toggleFilter(this,'group')">👥 Group (4+)</div>
+      <div style="margin-left:auto;">
+        <span class="badge badge-green">🟢 12 Available</span>
+        &nbsp;
+        <span class="badge badge-orange">🟠 8 Occupied</span>
+      </div>
+    </div>
+
+    <!-- FLOOR MAP -->
+    <div class="floor-map-section">
+      <div class="floor-map-title">Sol Café — Floor Plan</div>
+      <div class="floor-map" id="floorMap">
+        <div class="map-legend">
+          <div class="legend-item"><div class="legend-dot legend-available"></div> Available</div>
+          <div class="legend-item"><div class="legend-dot legend-occupied"></div> Occupied</div>
+          <div class="legend-item"><div class="legend-dot legend-selected"></div> Selected</div>
+          <div class="legend-item"><div class="legend-dot legend-accessible"></div> Accessible</div>
+        </div>
+
+        <!-- Zone Labels -->
+        <div class="zone-label" style="top:64px;left:20px;">← Entrance</div>
+        <div class="zone-label" style="top:64px;left:200px;">Study Zone A</div>
+        <div class="zone-label" style="top:64px;right:60px;">Window Row</div>
+        <div class="zone-label" style="top:280px;left:20px;">Accessible Area</div>
+        <div class="zone-label" style="top:280px;left:240px;">Group Zone</div>
+
+        <!-- TABLE SPOTS — arranged as floor plan -->
+        <!-- Row 1: Accessible near entrance -->
+        <div class="table-spot" style="left:20px;top:90px;" onclick="selectTable(this,'T1','Accessible','♿ Near entrance, armrests, wide access','available accessible',2)">
+          <div class="table-shape accessible" style="width:72px;height:50px;font-size:14px;">T1<br><span style="font-size:10px">♿</span></div>
+          <div class="table-label">For 2 · Acc.</div>
+        </div>
+        <div class="table-spot" style="left:20px;top:168px;" onclick="selectTable(this,'T2','Accessible Window','♿ Window light, accessible seating, armrests','available accessible',2)">
+          <div class="table-shape accessible" style="width:72px;height:50px;font-size:14px;">T2<br><span style="font-size:10px">♿🌅</span></div>
+          <div class="table-label">For 2 · Acc.</div>
+        </div>
+
+        <!-- Row 1: Study Zone -->
+        <div class="table-spot" style="left:160px;top:90px;" onclick="selectTable(this,'S1','Study Pod','🔌 Power outlet × 2, USB × 1, Desk lamp, Quiet zone','available',1)">
+          <div class="table-shape available" style="width:60px;height:60px;font-size:12px;">S1<br><span style="font-size:10px">🔌📱</span></div>
+          <div class="table-label">Solo · Study</div>
+        </div>
+        <div class="table-spot" style="left:240px;top:90px;" onclick="selectTable(this,'S2','Study Pod','🔌 Power outlet × 2, USB × 1, Quiet zone','available',1)">
+          <div class="table-shape available" style="width:60px;height:60px;font-size:12px;">S2<br><span style="font-size:10px">🔌📱</span></div>
+          <div class="table-label">Solo · Study</div>
+        </div>
+        <div class="table-spot" style="left:320px;top:90px;" onclick="selectTable(this,'S3','Study Pod','Occupied','occupied',1)">
+          <div class="table-shape occupied" style="width:60px;height:60px;font-size:12px;">S3<br><span style="font-size:10px">⛔</span></div>
+          <div class="table-label">Occupied</div>
+        </div>
+        <div class="table-spot" style="left:400px;top:90px;" onclick="selectTable(this,'S4','Study Pod','🔌 Power outlet × 2, USB × 2, Quiet zone','available',1)">
+          <div class="table-shape available" style="width:60px;height:60px;font-size:12px;">S4<br><span style="font-size:10px">🔌📱</span></div>
+          <div class="table-label">Solo · Study</div>
+        </div>
+        <div class="table-spot" style="left:480px;top:90px;" onclick="selectTable(this,'S5','Study Pod','Occupied','occupied',1)">
+          <div class="table-shape occupied" style="width:60px;height:60px;font-size:12px;">S5<br><span style="font-size:10px">⛔</span></div>
+          <div class="table-label">Occupied</div>
+        </div>
+
+        <!-- Window Row -->
+        <div class="table-spot" style="right:60px;top:90px;" onclick="selectTable(this,'W1','Window Seat','🌅 Natural light, USB charging, scenic view','available',2)">
+          <div class="table-shape available" style="width:70px;height:50px;font-size:12px;">W1<br><span style="font-size:10px">🌅📱</span></div>
+          <div class="table-label">For 2 · Window</div>
+        </div>
+        <div class="table-spot" style="right:60px;top:168px;" onclick="selectTable(this,'W2','Window Seat','🌅 Natural light, USB charging','available',2)">
+          <div class="table-shape available" style="width:70px;height:50px;font-size:12px;">W2<br><span style="font-size:10px">🌅📱</span></div>
+          <div class="table-label">For 2 · Window</div>
+        </div>
+        <div class="table-spot" style="right:60px;top:246px;" onclick="selectTable(this,'W3','Window Seat','Occupied','occupied',2)">
+          <div class="table-shape occupied" style="width:70px;height:50px;font-size:12px;">W3<br><span style="font-size:10px">⛔</span></div>
+          <div class="table-label">Occupied</div>
+        </div>
+
+        <!-- Row 2: Study + Group -->
+        <div class="table-spot" style="left:160px;top:200px;" onclick="selectTable(this,'S6','Study Pair','🔌 Power × 2, USB × 2, Shared desk lamp','available',2)">
+          <div class="table-shape available" style="width:80px;height:60px;font-size:12px;">S6<br><span style="font-size:10px">🔌🔌📱</span></div>
+          <div class="table-label">For 2 · Study</div>
+        </div>
+        <div class="table-spot" style="left:260px;top:200px;" onclick="selectTable(this,'S7','Study Pair','Occupied','occupied',2)">
+          <div class="table-shape occupied" style="width:80px;height:60px;font-size:12px;">S7<br><span style="font-size:10px">⛔</span></div>
+          <div class="table-label">Occupied</div>
+        </div>
+
+        <!-- Group Tables -->
+        <div class="table-spot" style="left:160px;top:310px;" onclick="selectTable(this,'G1','Group Table','👥 Sofa seating, USB × 4, Power × 2, Great for study groups','available',6)">
+          <div class="table-shape available" style="width:110px;height:70px;font-size:13px;">G1<br><span style="font-size:11px">👥🔌🔌📱</span></div>
+          <div class="table-label">For 4–6 · Group</div>
+        </div>
+        <div class="table-spot" style="left:300px;top:310px;" onclick="selectTable(this,'G2','Group Table','Occupied','occupied',4)">
+          <div class="table-shape occupied" style="width:100px;height:70px;font-size:13px;">G2<br><span style="font-size:11px">⛔</span></div>
+          <div class="table-label">Occupied</div>
+        </div>
+        <div class="table-spot" style="left:430px;top:310px;" onclick="selectTable(this,'G3','Group Table','👥 Comfortable sofa seating, USB × 2','available',4)">
+          <div class="table-shape available" style="width:100px;height:70px;font-size:13px;">G3<br><span style="font-size:11px">👥📱📱</span></div>
+          <div class="table-label">For 4 · Group</div>
+        </div>
+
+        <!-- Counter -->
+        <div style="position:absolute;bottom:16px;right:16px;background:var(--sol-brown);color:var(--sol-cream);border-radius:10px;padding:10px 16px;font-size:12px;font-weight:600;">
+          ☕ Counter &amp; Bar →
+        </div>
+      </div>
+    </div>
+
+    <!-- SELECTED TABLE DETAIL -->
+    <div class="table-detail-sidebar" id="tableDetailPanel" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
+        <div>
+          <div id="tableDetailId" style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--sol-dark);"></div>
+          <div id="tableDetailType" style="font-size:13px;color:var(--sol-muted);margin-top:4px;"></div>
+        </div>
+        <div id="tableDetailBadge"></div>
+      </div>
+      <p id="tableDetailDesc" style="font-size:14px;color:var(--sol-muted);line-height:1.7;margin-bottom:20px;"></p>
+      <div class="amenity-grid" id="tableAmenities"></div>
+      <div style="display:flex;gap:12px;margin-top:16px;">
+        <button class="btn btn-gold" style="flex:1;" onclick="bookSelectedTable()">📅 Book This Table</button>
+        <button class="btn btn-outline btn-sm" onclick="showPage('order')">☕ + Add Order</button>
+      </div>
+    </div>
+
+    <!-- ALL TABLES CARDS -->
+    <div style="margin-top:32px;">
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--sol-dark);margin-bottom:20px;">All Zones at a Glance</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+        <div class="card" style="padding:24px;">
+          <div style="font-size:32px;margin-bottom:12px;">📚</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--sol-dark);margin-bottom:8px;">Study Zone</div>
+          <div style="font-size:12px;color:var(--sol-muted);line-height:1.6;margin-bottom:16px;">6 solo pods & 2 pair desks. Each with 🔌 power outlets, 📱 USB-C & USB-A charging ports, dedicated desk lamp, and sound-dampening panels.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="badge badge-green">6 Available</span>
+            <span class="badge badge-gold">Power + USB</span>
+          </div>
+        </div>
+        <div class="card" style="padding:24px;">
+          <div style="font-size:32px;margin-bottom:12px;">🌅</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--sol-dark);margin-bottom:8px;">Window Row</div>
+          <div style="font-size:12px;color:var(--sol-muted);line-height:1.6;margin-bottom:16px;">3 window-facing tables for 2. Natural daylight, USB charging on wall-mount, perfect for casual catch-ups or reading.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="badge badge-green">2 Available</span>
+            <span class="badge badge-gold">USB Charging</span>
+          </div>
+        </div>
+        <div class="card" style="padding:24px;">
+          <div style="font-size:32px;margin-bottom:12px;">👥</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--sol-dark);margin-bottom:8px;">Group Zone</div>
+          <div style="font-size:12px;color:var(--sol-muted);line-height:1.6;margin-bottom:16px;">3 sofa-booth tables for 4–6 people. USB × 4 per table, power × 2, and a relaxed layout for group projects.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="badge badge-green">2 Available</span>
+            <span class="badge badge-gold">Power + USB</span>
+          </div>
+        </div>
+        <div class="card" style="padding:24px;">
+          <div style="font-size:32px;margin-bottom:12px;">♿</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--sol-dark);margin-bottom:8px;">Accessible Area</div>
+          <div style="font-size:12px;color:var(--sol-muted);line-height:1.6;margin-bottom:16px;">2 priority tables near the entrance. Wide clearance for wheelchairs, armrests, no steps, accessible bathroom adjacent. For elderly guests & mobility needs.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="badge badge-green">2 Available</span>
+            <span class="badge badge-orange">Priority Area</span>
+          </div>
+        </div>
+        <div class="card" style="padding:24px;">
+          <div style="font-size:32px;margin-bottom:12px;">🔌</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--sol-dark);margin-bottom:8px;">Charging Hubs</div>
+          <div style="font-size:12px;color:var(--sol-muted);line-height:1.6;margin-bottom:16px;">12 power outlets throughout, 18 USB-A & USB-C ports, Qi wireless charging pads on all study desks. Never run out of battery again.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="badge badge-gold">USB-A & USB-C</span>
+            <span class="badge badge-green">Qi Wireless</span>
+          </div>
+        </div>
+        <div class="card" style="padding:24px;">
+          <div style="font-size:32px;margin-bottom:12px;">📶</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--sol-dark);margin-bottom:8px;">Connectivity</div>
+          <div style="font-size:12px;color:var(--sol-muted);line-height:1.6;margin-bottom:16px;">Ultra-fast Wi-Fi 6 (500 Mbps), network: <strong>SolCafe_Guest</strong>, password shown on your table stand. Booster nodes in every zone.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="badge badge-green">Wi-Fi 6</span>
+            <span class="badge badge-gold">500 Mbps</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:40px;">
+      <button class="btn btn-gold btn-lg" onclick="showPage('booking')">📅 Book Your Preferred Table</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     PAGE: PAYMENT
+═══════════════════════════════ -->
+<div id="page-payment" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="page-header-label">Secure Checkout</div>
+      <h1 class="page-header-title">Payment 💳</h1>
+      <p class="page-header-sub">Your connection is encrypted. We accept all major cards and Apple/Google Pay.</p>
+    </div>
+  </div>
+
+  <div class="payment-layout">
+    <!-- FORM -->
+    <div class="payment-form-card">
+
+      <!-- Pay methods -->
+      <div class="payment-section-title">Choose Payment Method</div>
+      <div class="payment-methods">
+        <div class="pay-method active" onclick="selectPayMethod(this,'card')">
+          <span class="pay-method-icon">💳</span>
+          <div class="pay-method-label">Card</div>
+        </div>
+        <div class="pay-method" onclick="selectPayMethod(this,'apple')">
+          <span class="pay-method-icon">🍎</span>
+          <div class="pay-method-label">Apple Pay</div>
+        </div>
+        <div class="pay-method" onclick="selectPayMethod(this,'google')">
+          <span class="pay-method-icon">G</span>
+          <div class="pay-method-label">Google Pay</div>
+        </div>
+        <div class="pay-method" onclick="selectPayMethod(this,'cash')">
+          <span class="pay-method-icon">💵</span>
+          <div class="pay-method-label">Pay on Arrival</div>
+        </div>
+      </div>
+
+      <!-- Card preview -->
+      <div class="card-number-display">
+        <div class="card-chip">💳</div>
+        <div class="card-num-text" id="cardNumDisplay">•••• •••• •••• ••••</div>
+        <div class="card-meta">
+          <span id="cardNameDisplay">CARDHOLDER NAME</span>
+          <span id="cardExpDisplay">MM/YY</span>
+          <span id="cardTypeDisplay">VISA</span>
+        </div>
+      </div>
+
+      <!-- Card fields -->
+      <div id="cardFields">
+        <div class="form-group">
+          <label>Cardholder Name</label>
+          <input type="text" id="cardName" placeholder="Jane Smith" oninput="document.getElementById('cardNameDisplay').textContent=this.value.toUpperCase()||'CARDHOLDER NAME'">
+        </div>
+        <div class="form-group">
+          <label>Card Number</label>
+          <input type="text" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19"
+            oninput="formatCardNum(this)">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Expiry Date</label>
+            <input type="text" id="cardExp" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
+          </div>
+          <div class="form-group">
+            <label>CVV</label>
+            <input type="password" id="cardCvv" placeholder="•••" maxlength="4">
+          </div>
+        </div>
+      </div>
+
+      <!-- Billing -->
+      <div class="payment-section-title" style="margin-top:8px;">Billing Details</div>
+      <div class="form-group">
+        <label>Email for Receipt</label>
+        <input type="email" id="payEmail" placeholder="jane@university.ac.uk">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="payFirst" placeholder="Jane">
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="payLast" placeholder="Smith">
+        </div>
+      </div>
+
+      <!-- Terms -->
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin:16px 0;font-size:12px;color:var(--sol-muted);">
+        <input type="checkbox" id="payTerms" style="width:16px;height:16px;flex-shrink:0;margin-top:2px;accent-color:var(--sol-gold);">
+        I agree to Sol Café's <a href="#" style="color:var(--sol-gold);">Terms & Conditions</a> and <a href="#" style="color:var(--sol-gold);">Cancellation Policy</a>. Booking deposits are refunded on arrival.
+      </label>
+
+      <button class="btn btn-green btn-lg" style="width:100%;" onclick="processPayment()">
+        🔒 Pay Securely
+      </button>
+
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-top:16px;opacity:0.5;">
+        <span style="font-size:20px;">🔒</span>
+        <span style="font-size:11px;color:var(--sol-muted);">256-bit SSL encrypted · PCI DSS compliant · Powered by Stripe</span>
+      </div>
+    </div>
+
+    <!-- ORDER SUMMARY -->
+    <div class="order-summary-card">
+      <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--sol-dark);margin-bottom:20px;">Order Summary</div>
+
+      <div class="summary-section">
+        <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--sol-gold);margin-bottom:12px;" id="paymentTypeLabel">Items Ordered</div>
+        <div id="paymentItemsList">
+          <div style="font-size:13px;color:var(--sol-muted);font-style:italic;">No items in cart.</div>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--sol-border);margin:16px 0;">
+
+      <div class="summary-row">
+        <span style="color:var(--sol-muted);">Subtotal</span>
+        <span id="paySub">£0.00</span>
+      </div>
+      <div class="summary-row">
+        <span style="color:var(--sol-muted);">Service charge</span>
+        <span>£0.00</span>
+      </div>
+      <div class="summary-row" style="font-size:11px;color:var(--sol-green);">
+        <span>🏷️ Student discount</span>
+        <span>-£0.00</span>
+      </div>
+      <div class="summary-row total">
+        <span>Total</span>
+        <span id="payTotal" style="color:var(--sol-brown);font-size:22px;font-weight:800;">£0.00</span>
+      </div>
+
+      <div style="background:rgba(61,90,62,0.06);border:1px solid rgba(61,90,62,0.15);border-radius:12px;padding:14px;margin-top:16px;">
+        <div style="font-size:12px;font-weight:600;color:var(--sol-green);margin-bottom:6px;">🔒 Safe & Secure</div>
+        <div style="font-size:11px;color:var(--sol-muted);line-height:1.6;">Your payment is processed securely. You'll receive a confirmation email instantly with your QR code.</div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-outline btn-sm" style="width:100%;" onclick="history.back()">← Go Back & Edit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     PAGE: CONFIRMATION
+═══════════════════════════════ -->
+<div id="page-confirm" class="page">
+  <div class="confirm-wrapper">
+    <div class="confirm-card">
+      <div class="confirm-tick">✓</div>
+      <h1 class="confirm-title">You're all set!</h1>
+      <p class="confirm-sub">Your order & reservation at Sol Café has been confirmed. We can't wait to see you! ☕</p>
+
+      <div class="confirm-code" id="confirmCode">SOL-••••••</div>
+
+      <div class="confirm-details">
+        <div class="confirm-row">
+          <span class="confirm-row-label">Name</span>
+          <span class="confirm-row-val" id="confirmName">—</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-row-label">Order</span>
+          <span class="confirm-row-val" id="confirmOrder">—</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-row-label">Table</span>
+          <span class="confirm-row-val" id="confirmTable">—</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-row-label">Pick-up / Arrival</span>
+          <span class="confirm-row-val" id="confirmTime">—</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-row-label">Total Paid</span>
+          <span class="confirm-row-val" style="color:var(--sol-brown);" id="confirmTotal">—</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-row-label">Status</span>
+          <span class="badge badge-green">✅ Confirmed</span>
+        </div>
+      </div>
+
+      <div style="background:linear-gradient(135deg,rgba(200,146,42,0.05),rgba(200,146,42,0.1));border:1px solid rgba(200,146,42,0.2);border-radius:12px;padding:16px;margin-bottom:28px;font-size:13px;color:var(--sol-muted);line-height:1.7;">
+        📧 A confirmation has been sent to your email with a QR code. Show it at the counter to collect your order and at the entrance for your table. Our team will also send you a reminder 30 min before.
+      </div>
+
+      <div class="confirm-actions">
+        <button class="btn btn-primary" onclick="showPage('home')">🏠 Back to Home</button>
+        <button class="btn btn-gold" onclick="showPage('order')">+ New Order</button>
+        <button class="btn btn-outline btn-sm" onclick="showPage('booking')">📅 Book Again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════ -->
+<script>
+// ─── STATE ───────────────────────────────
+let cart = {};
+let currentFlow = 'order';
+let selectedTableId = null;
+
+// ─── MENU DATA ───────────────────────────
+const menuItems = [
+  { id:'latte', name:'Sol Signature Latte', desc:'Double shot, oat milk, brown sugar', price:3.80, emoji:'☕', cat:['drinks','hot'], vegan:true },
+  { id:'cappuccino', name:'Cappuccino', desc:'Rich espresso with silky foam', price:3.40, emoji:'🫧', cat:['drinks','hot'], vegan:false },
+  { id:'iced_coffee', name:'Iced Brown Sugar Coffee', desc:'Chilled, sweet & energising', price:4.20, emoji:'🧋', cat:['drinks'], vegan:true },
+  { id:'matcha', name:'Matcha Oat Latte', desc:'Ceremonial grade, earthy & smooth', price:4.50, emoji:'🍵', cat:['drinks','hot','vegan'], vegan:true },
+  { id:'tea', name:'Chamomile Gold Tea', desc:'Honey & lavender, hot or iced', price:2.90, emoji:'🫖', cat:['drinks','hot','vegan'], vegan:true },
+  { id:'croissant', name:'Butter Croissant', desc:'Freshly baked, flaky & golden', price:2.50, emoji:'🥐', cat:['food'], vegan:false },
+  { id:'avocado', name:'Avo Toast', desc:'Sourdough, avocado, chilli flakes, lemon', price:6.50, emoji:'🥑', cat:['food','vegan'], vegan:true },
+  { id:'granola', name:'Granola Bowl', desc:'Coconut yoghurt, seasonal fruit, honey', price:5.20, emoji:'🍚', cat:['food','vegan'], vegan:true },
+  { id:'cake', name:'Cardamom Cake Slice', desc:'House recipe, baked daily', price:3.50, emoji:'🍰', cat:['sweet','food'], vegan:false },
+  { id:'brownie', name:'Dark Chocolate Brownie', desc:'Fudgy, dense & decadent', price:3.20, emoji:'🍫', cat:['sweet','vegan'], vegan:true },
+  { id:'muffin', name:'Blueberry Muffin', desc:'Lemon glaze, bursting berries', price:2.80, emoji:'🫐', cat:['sweet','food'], vegan:false },
+  { id:'sandwich', name:'Club Sandwich', desc:'Sourdough, chicken, pesto, sun-dried tomato', price:7.20, emoji:'🥪', cat:['food'], vegan:false },
+];
+
+// ─── CURSOR ──────────────────────────────
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+document.addEventListener('mousedown', () => cursor.classList.add('big'));
+document.addEventListener('mouseup', () => cursor.classList.remove('big'));
+
+// ─── PAGE NAV ────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+  const navBtn = document.getElementById('nav-' + id);
+  if (navBtn) navBtn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (id === 'order') renderMenu('all');
+  if (id === 'payment') populatePaymentSummary();
+}
+
+// ─── TOAST ───────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// ─── MENU ────────────────────────────────
+function renderMenu(filter) {
+  const grid = document.getElementById('menuGrid');
+  const items = filter === 'all' ? menuItems : menuItems.filter(i => i.cat.includes(filter));
+  grid.innerHTML = items.map(item => `
+    <div class="order-item-card ${(cart[item.id]||0)>0?'selected':''}" id="card-${item.id}">
+      <div class="order-item-emoji">${item.emoji}</div>
+      <div class="order-item-info">
+        <div class="order-item-name">${item.name}</div>
+        <div class="order-item-desc">${item.desc}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="order-item-price">£${item.price.toFixed(2)}</div>
+          <div class="item-qty-control">
+            <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+            <span class="qty-num" id="qty-${item.id}">${cart[item.id]||0}</span>
+            <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+          </div>
+        </div>
+        ${item.vegan ? '<span class="badge badge-green" style="margin-top:6px;font-size:10px;">🌱 Vegan</span>' : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterMenu(cat, el) {
+  document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderMenu(cat);
+}
+
+function changeQty(id, delta) {
+  const item = menuItems.find(i => i.id === id);
+  cart[id] = Math.max(0, (cart[id] || 0) + delta);
+  if (cart[id] === 0) delete cart[id];
+  document.getElementById('qty-' + id).textContent = cart[id] || 0;
+  const card = document.getElementById('card-' + id);
+  if (cart[id] > 0) card.classList.add('selected'); else card.classList.remove('selected');
+  renderCart();
+  if (delta > 0) showToast('✓ ' + item.name + ' added!');
+}
+
+function addToCartQuick(name, price) {
+  const item = menuItems.find(i => i.name === name);
+  if (item) { changeQty(item.id, 1); }
+  else { showToast('✓ Added to cart!'); }
+}
+
+function renderCart() {
+  const items = document.getElementById('cartItems');
+  const empty = document.getElementById('cartEmpty');
+  const entries = Object.entries(cart);
+  if (!entries.length) {
+    if (empty) empty.style.display = 'block';
+    items.innerHTML = '<div class="cart-empty" id="cartEmpty"><div style="font-size:40px;margin-bottom:12px;">☕</div><div>Your cart is empty.<br>Add items from the menu!</div></div>';
+    updateCartTotals(0);
+    return;
+  }
+  let total = 0;
+  items.innerHTML = entries.map(([id, qty]) => {
+    const item = menuItems.find(i => i.id === id);
+    const subtotal = item.price * qty;
+    total += subtotal;
+    return `<div class="cart-item">
+      <div>
+        <div class="cart-item-name">${item.emoji} ${item.name}</div>
+        <div class="cart-item-sub">× ${qty} · £${item.price.toFixed(2)} each</div>
+      </div>
+      <div class="cart-item-price">£${subtotal.toFixed(2)}</div>
+    </div>`;
+  }).join('');
+  updateCartTotals(total);
+}
+
+function updateCartTotals(total) {
+  document.getElementById('cartSubtotal').textContent = '£' + total.toFixed(2);
+  document.getElementById('cartTotal').textContent = '£' + total.toFixed(2);
+}
+
+// ─── PAYMENT ────────────────────────────
+function proceedToPayment(flow) {
+  currentFlow = flow;
+  if (flow === 'order') {
+    const name = document.getElementById('orderName').value;
+    if (!name) { showToast('⚠️ Please enter your name for the order'); return; }
+    const entries = Object.entries(cart);
+    if (!entries.length) { showToast('⚠️ Your cart is empty!'); return; }
+  }
+  if (flow === 'booking') {
+    const fn = document.getElementById('bookFirstName').value;
+    if (!fn) { showToast('⚠️ Please fill in your name'); return; }
+  }
+  showPage('payment');
+}
+
+function populatePaymentSummary() {
+  const label = document.getElementById('paymentTypeLabel');
+  const list = document.getElementById('paymentItemsList');
+  const sub = document.getElementById('paySub');
+  const total = document.getElementById('payTotal');
+
+  const entries = Object.entries(cart);
+  let t = 0;
+
+  if (entries.length > 0) {
+    list.innerHTML = entries.map(([id,qty]) => {
+      const item = menuItems.find(i => i.id === id);
+      const st = item.price * qty;
+      t += st;
+      return `<div class="summary-row"><span>${item.emoji} ${item.name} ×${qty}</span><span>£${st.toFixed(2)}</span></div>`;
+    }).join('');
+  } else {
+    list.innerHTML = '<div style="font-size:13px;color:var(--sol-muted);">Table booking deposit: £1.00</div>';
+    t = 1.00;
+  }
+
+  if (currentFlow === 'booking') {
+    t += 1.00;
+    list.innerHTML += '<div class="summary-row"><span>📅 Booking deposit</span><span>£1.00</span></div>';
+  }
+
+  sub.textContent = '£' + t.toFixed(2);
+  total.textContent = '£' + t.toFixed(2);
+}
+
+function selectPayMethod(el, method) {
+  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+  const cf = document.getElementById('cardFields');
+  cf.style.display = (method === 'card') ? 'block' : 'none';
+}
+
+function formatCardNum(inp) {
+  let v = inp.value.replace(/\D/g,'').substring(0,16);
+  inp.value = v.replace(/(.{4})/g,'$1 ').trim();
+  document.getElementById('cardNumDisplay').textContent = v.padEnd(16,'•').replace(/(.{4})/g,'$1 ').trim() || '•••• •••• •••• ••••';
+}
+
+function formatExpiry(inp) {
+  let v = inp.value.replace(/\D/g,'');
+  if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2,4);
+  inp.value = v;
+  document.getElementById('cardExpDisplay').textContent = v || 'MM/YY';
+}
+
+function processPayment() {
+  if (!document.getElementById('payTerms').checked) {
+    showToast('⚠️ Please accept the terms & conditions'); return;
+  }
+  const btn = document.querySelector('#page-payment .btn-green');
+  btn.textContent = '⏳ Processing...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    const code = 'SOL-' + Math.random().toString(36).substring(2,8).toUpperCase();
+    document.getElementById('confirmCode').textContent = code;
+
+    const fn = document.getElementById('payFirst').value || document.getElementById('bookFirstName').value || document.getElementById('orderName').value || 'Guest';
+    document.getElementById('confirmName').textContent = fn;
+
+    const entries = Object.entries(cart);
+    document.getElementById('confirmOrder').textContent = entries.length ? entries.map(([id,q]) => {
+      const item = menuItems.find(i => i.id === id);
+      return `${item.emoji} ${item.name} ×${q}`;
+    }).join(', ') : 'Table booking only';
+
+    document.getElementById('confirmTable').textContent = selectedTableId ? selectedTableId : (document.getElementById('bookTablePref')?.value || 'To be assigned');
+    document.getElementById('confirmTime').textContent = document.getElementById('pickupTime')?.value || document.getElementById('bookDate')?.value || 'On arrival';
+    document.getElementById('confirmTotal').textContent = document.getElementById('payTotal').textContent;
+
+    btn.textContent = '🔒 Pay Securely';
+    btn.disabled = false;
+    showPage('confirm');
+    showToast('🎉 Payment successful!');
+  }, 1800);
+}
+
+// ─── TABLE SELECTION ─────────────────────
+function selectTable(el, id, type, desc, status, cap) {
+  if (status.includes('occupied')) { showToast('⚠️ This table is currently occupied'); return; }
+
+  document.querySelectorAll('.table-shape').forEach(s => {
+    if (s.classList.contains('selected')) {
+      s.classList.remove('selected');
+      const parent = s.parentElement;
+      if (status.includes('accessible')) s.classList.add('accessible');
+      else s.classList.add('available');
+    }
+  });
+
+  const shape = el.querySelector('.table-shape');
+  shape.className = 'table-shape selected';
+  shape.style.cssText += ';width:' + shape.offsetWidth + 'px;height:' + shape.offsetHeight + 'px;';
+  selectedTableId = id;
+
+  const panel = document.getElementById('tableDetailPanel');
+  panel.style.display = 'block';
+  document.getElementById('tableDetailId').textContent = 'Table ' + id + ' — ' + type;
+  document.getElementById('tableDetailType').textContent = 'Capacity: ' + cap + (cap === 1 ? ' person' : ' people');
+  document.getElementById('tableDetailDesc').textContent = desc;
+
+  const badgeEl = document.getElementById('tableDetailBadge');
+  if (status.includes('accessible')) badgeEl.innerHTML = '<span class="badge badge-orange">♿ Accessible</span>';
+  else badgeEl.innerHTML = '<span class="badge badge-green">✅ Available</span>';
+
+  const amenities = [];
+  if (desc.includes('Power') || desc.includes('🔌')) amenities.push({icon:'🔌',label:'Power Outlet'});
+  if (desc.includes('USB') || desc.includes('📱')) amenities.push({icon:'📱',label:'USB Charging'});
+  if (desc.includes('Quiet') || desc.includes('quiet')) amenities.push({icon:'🔇',label:'Quiet Zone'});
+  if (desc.includes('Window') || desc.includes('🌅')) amenities.push({icon:'🌅',label:'Window View'});
+  if (desc.includes('lamp') || desc.includes('Lamp')) amenities.push({icon:'💡',label:'Desk Lamp'});
+  if (desc.includes('♿') || desc.includes('accessible')) amenities.push({icon:'♿',label:'Accessible'});
+  if (desc.includes('sofa') || desc.includes('Sofa')) amenities.push({icon:'🛋',label:'Sofa Seating'});
+  if (amenities.length === 0) amenities.push({icon:'🪑',label:'Comfortable'},{icon:'☕',label:'Table Service'});
+
+  document.getElementById('tableAmenities').innerHTML = amenities.map(a => `
+    <div class="amenity-card">
+      <div class="amenity-card-icon">${a.icon}</div>
+      <div class="amenity-card-label">${a.label}</div>
+    </div>
+  `).join('');
+
+  panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  showToast('✓ Table ' + id + ' selected!');
+}
+
+function bookSelectedTable() {
+  if (!selectedTableId) { showToast('Please select a table first'); return; }
+  showPage('booking');
+  showToast('✓ Table ' + selectedTableId + ' pre-selected for your booking');
+}
+
+function toggleFilter(el, filter) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  showToast('🔍 Filtered: ' + filter);
+}
+
+// ─── INIT ────────────────────────────────
+window.onload = () => {
+  renderMenu('all');
+  // Set today as default booking date
+  const today = new Date();
+  const dateEl = document.getElementById('bookDate');
+  if (dateEl) {
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    dateEl.value = tomorrow.toISOString().split('T')[0];
+    dateEl.min = today.toISOString().split('T')[0];
+  }
+};
+</script>
+</body>
+</html>
